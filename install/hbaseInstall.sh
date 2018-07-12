@@ -1,13 +1,12 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    hadoopInstall.sh
-## Description: 安装配置hadoop集群
+## Filename:    hbaseInstall.sh
+## Description: 安装配置hbase
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      lidiliang
-## Editor:      mashencai
-## Created:     2017-10-23
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28 
 ################################################################################
 
 #set -x
@@ -66,16 +65,16 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 
-## 解压hbase jar 包
+## 解压hbase tar 包
 echo ""  | tee -a $LOG_FILE
 echo "**********************************************" | tee -a $LOG_FILE
 
 cd  ${HBASE_SOURCE_DIR}
-echo "解压hbase 中，please waiting...."   | tee  -a  $LOG_FILE
-tar -xf hbase.tar.gz
+#echo "解压hbase 中，please waiting...."   | tee  -a  $LOG_FILE
+#tar -xf hbase.tar.gz
 rm -rf ${HBASE_HOME}
 cp -r hbase ${HBASE_INSTALL_HOME} 
-echo "解压hbase done......"  | tee  -a  $LOG_FILE
+#echo "解压hbase done......"  | tee  -a  $LOG_FILE
 cd -
 
 ## 设置hbase-env.sh java home
@@ -86,11 +85,11 @@ sed -i "s#java_home#${JAVA_HOME}#g" hbase-env.sh
 echo "设置jdk 路径........." | tee -a $LOG_FILE
 
 
-## 设置regionserver caodabao
+## 设置regionserver 
 echo ""  | tee -a $LOG_FILE
 echo "**********************************************" | tee -a $LOG_FILE
 
-## 配置regionservers文件 caodabao
+## 配置regionservers文件 
 #num=$(sed -n '$=' ${CONF_DIR}/hostnamelists.properties)
 #for (( i=2; i<=${num}; i++ ))
 #do
@@ -99,7 +98,7 @@ echo "**********************************************" | tee -a $LOG_FILE
 #done
 #echo "设置regionservers done"  | tee -a $LOG_FILE
 
-## 配置regionservers文件（马燊偲）
+## 配置regionservers文件
 ## Hbase的从节点
 HBASE_HREGION_ARRY=(${HBASE_HREGIONSERVER//;/ })
 for hostname in ${HBASE_HREGION_ARRY[@]}

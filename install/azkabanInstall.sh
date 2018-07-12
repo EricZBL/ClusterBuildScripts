@@ -4,8 +4,8 @@
 ## Filename:    azkabanInstall.sh
 ## Description: 安装azkaban。
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      caodabao
+## Version:     2.0
+## Author:      zhangbaolin
 ## Created:     2018-1-12 
 ################################################################################
 
@@ -230,7 +230,7 @@ function writeUI_file()
 #####################################################################
 function main()
 {
-    compression_the_tar
+#    compression_the_tar
     config_webazkaban_properties
     config_exeazkaban_properties
     xync_azkaban

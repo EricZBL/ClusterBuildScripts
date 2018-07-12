@@ -4,9 +4,9 @@
 ## Filename:    haproxyInstall.sh
 ## Description: 安装配置Haproxy代理
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      pengcong
-## Created:     2017-11-8 
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28 
 ################################################################################
 
  
@@ -23,7 +23,7 @@ HAPROXY_SOURCE_DIR=${ROOT_HOME}/component/bigdata
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ## HAPROXY_INSTALL_HOME HAPROXY 安装目录
-HAPROXY_INSTALL_HOME=${INSTALL_HOME}/HAPrxoy
+HAPROXY_INSTALL_HOME=${INSTALL_HOME}/HAProxy
 ## HAPROXY_HOME  HAPROXY 根目录
 HAPROXY_HOME=${HAPROXY_INSTALL_HOME}/haproxy
 ## HAPROXY_LOG_DIR HAPROXY 日志目录
@@ -197,10 +197,10 @@ function main()
     if [ ! -e "$HAPROXY_HOME" ]; then 
         mkdir -p ${HAPROXY_HOME}
         cd ${HAPROXY_SOURCE_DIR} 
-        tar zxf haproxy*.tar.gz
+#        tar zxf haproxy*.tar.gz
         cd haproxy*/ 
         make TARGET=linux26 ARCH=x86_64 PREFIX=${HAPROXY_HOME} && make install PREFIX=${HAPROXY_HOME} && mkdir ${HAPROXY_HOME}/{html,logs,conf} 
-        ! grep 'haproxy' /etc/rsyslog.conf && echo 'local1.*            ${HAPROXY_HOME}/log/haproxy.log' >> /etc/rsyslog.conf
+        ! grep 'haproxy' /etc/rsyslog.conf && echo 'local1.*            /opt/hzgc/logs/haproxy/haproxy.log' >> /etc/rsyslog.conf
         sed -ir 's/SYSLOGD_OPTIONS="-m 0"/SYSLOGD_OPTIONS="-r -m 0"/g' /etc/sysconfig/rsyslog 
         install_ha_cfg
         cfg_config

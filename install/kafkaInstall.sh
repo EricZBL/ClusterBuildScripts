@@ -5,9 +5,9 @@
 ## Description:   安装 kafka
 ## Version:       1.0
 ## Kafka.Version: 0.11.0.1 
-## Author:        qiaokaifeng
-## Editor:        mashencai
-## Created:       2017-10-24
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-29 
 ################################################################################
 
 #set -x
@@ -58,13 +58,13 @@ echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 echo ""  | tee  -a  $LOG_FILE
 echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
-echo “解压kafka tar 包中，请稍候.......”  | tee -a $LOG_FILE
-tar -xf ${KAFKA_SOURCE_DIR}/kafka.tar.gz -C ${KAFKA_SOURCE_DIR}
-if [ $? == 0 ];then
-    echo "解压缩kafka 安装包成功......"  | tee -a $LOG_FILE
-else
-    echo “解压kafka 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
-fi
+#echo “解压kafka tar 包中，请稍候.......”  | tee -a $LOG_FILE
+#tar -xf ${KAFKA_SOURCE_DIR}/kafka.tar.gz -C ${KAFKA_SOURCE_DIR}
+#if [ $? == 0 ];then
+#    echo "解压缩kafka 安装包成功......"  | tee -a $LOG_FILE
+#else
+#    echo “解压kafka 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
+#fi
 
     mkdir -p ${KAFKA_SOURCE_DIR}/tmp
     cp -r ${KAFKA_SOURCE_DIR}/kafka ${KAFKA_SOURCE_DIR}/tmp

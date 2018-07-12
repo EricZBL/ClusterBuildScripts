@@ -4,9 +4,9 @@
 ## Filename:    mysqlInstall.sh
 ## Description: 安装并启动mysql。
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      lidiliang
-## Created:     2017-12-8  caodabao
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28 
 ################################################################################
 
 #set -x
@@ -47,13 +47,13 @@ done
 rm -rf mysql.tmp
 
 ## 查看对应MySQL目录,如果存在则删除对应目录
-find / -name mysql > mysql.tmp
-for mysql_dir in $(cat  mysql.tmp);do
-    echo "==================================================="  | tee -a $LOG_FILE
-    echo "删除对应的mysql目录: ${mysql_dir}"  |  tee  -a  $LOG_FILE
-    rm -rf ${mysql_dir}
-done
-rm -rf mysql.tmp
+#find / -name mysql > mysql.tmp
+#for mysql_dir in $(cat  mysql.tmp);do
+#    echo "==================================================="  | tee -a $LOG_FILE
+#    echo "删除对应的mysql目录: ${mysql_dir}"  |  tee  -a  $LOG_FILE
+#    rm -rf ${mysql_dir}
+#done
+#rm -rf mysql.tmp
 
 ## 删除对应my.cnf文件
 MY_CNF="/etc/my.cnf"

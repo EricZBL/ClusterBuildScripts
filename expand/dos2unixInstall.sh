@@ -19,6 +19,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展配置文件目录
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
@@ -26,14 +28,14 @@ LOG_FILE=${LOG_DIR}/dos2unixInstall.log
 ## dos2unix rpm 软件目录
 DOS2UNIX_RPM_DIR=${ROOT_HOME}/component/basic_suports/dos2unixRpm
 ## 基础工具安装路径
-INSTALL_HOME_BASIC=$(grep System_SuportDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+INSTALL_HOME_BASIC=$(grep System_SuportDir ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 ## dos2unix rpm 软件最终目录
 DOS2UNIX_RPM_INSTALL_HOME=${INSTALL_HOME_BASIC}/dos2unixRpm
-## dos2unix的安装节点，集群所有主机名，放入数组中
-CLUSTER_HOSTNAME_LISTS=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+## dos2unix的安装节点，扩展节点IP，放入数组中
+CLUSTER_HOSTNAME_LISTS=$(grep Cluster_HostName ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 CLUSTER_HOSTNAME_ARRY=(${CLUSTER_HOSTNAME_LISTS//;/ })
 
-PASSWORD=$(grep SSH_Password ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+PASSWORD=$(grep SSH_Password ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 
 
 if [ ! -d $LOG_DIR ];then
@@ -59,12 +61,5 @@ do
     fi
     sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no root@$name "rpm -ivh ${DOS2UNIX_RPM_INSTALL_HOME}/dos2unix-3.1-37.el6.x86_64.rpm; which dos2unix; rm -rf ${INSTALL_HOME_BASIC}"  
 done
-
-##把执行脚本的节点上的脚本转成unix编码
-dos2unix ${ROOT_HOME}/conf/*
-dos2unix ${ROOT_HOME}/service/*
-dos2unix ${ROOT_HOME}/expend/*
-dos2unix ${ROOT_HOME}/install/*
-echo "转换脚本编码格式完成" | tee -a $LOG_FILE
 
 set +x

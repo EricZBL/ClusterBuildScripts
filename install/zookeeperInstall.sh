@@ -47,15 +47,15 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 
-## 解压zookeeper安装包
-echo "**************************************************"  | tee -a $LOG_FILE
-echo “解压zookeeper tar 包中，请稍候.......”  | tee -a $LOG_FILE
-tar -xf ${ZOOKEEPER_SOURCE_DIR}/zookeeper.tar.gz -C ${ZOOKEEPER_SOURCE_DIR}
-if [ $? == 0 ];then
-    echo "解压缩zookeeper 安装包成功......"  | tee -a $LOG_FILE
-else
-    echo “解压zookeeper 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
-fi
+### 解压zookeeper安装包
+#echo "**************************************************"  | tee -a $LOG_FILE
+#echo “解压zookeeper tar 包中，请稍候.......”  | tee -a $LOG_FILE
+#tar -xf ${ZOOKEEPER_SOURCE_DIR}/zookeeper.tar.gz -C ${ZOOKEEPER_SOURCE_DIR}
+#if [ $? == 0 ];then
+#    echo "解压缩zookeeper 安装包成功......"  | tee -a $LOG_FILE
+#else
+#    echo “解压zookeeper 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
+#fi
 
 
 ## 流程，先配置好各个节点所需要的安装的内容。
@@ -74,7 +74,7 @@ do
     echo "server.${i}=${insName}:2888:3888" >> ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg
     echo "$i" > ${ZOOKEEPER_SOURCE_DIR}/$insName/zookeeper/data/myid
     echo "修改 ${insName} 的zookeeper logs目录 "  | tee -a $LOG_FILE
-    sed -i "s;zookeeper_logs;${ZOOKEEPER_HOME};g"  ${ZOOKEEPER_SOURCE_DIR}/$insName/zookeeper/bin/zkEnv.sh
+    sed -i "s;zookeeper_logs\/logs;\/opt\/hzgc\/logs\/zookeeper;g"  ${ZOOKEEPER_SOURCE_DIR}/$insName/zookeeper/bin/zkEnv.sh
 done
 
 echo "" | tee -a  $LOG_FILE
@@ -112,7 +112,7 @@ do
     echo "**********************************************" | tee -a $LOG_FILE
     echo "删除临时目录${insName}...... "  | tee -a $LOG_FILE
     rm -rf ${ZOOKEEPER_SOURCE_DIR}/$insName
-    rm -rf ${ZOOKEEPER_SOURCE_DIR}/zookeeper
+#    rm -rf ${ZOOKEEPER_SOURCE_DIR}/zookeeper
 done
 
 set +x

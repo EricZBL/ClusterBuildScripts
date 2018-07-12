@@ -58,5 +58,7 @@ NUM_EXCUTORS=${5:-$DEFAULT_EXECUTORS}
 $SPARK_HOME/sbin/start-thriftserver.sh --master yarn --driver-memory ${DRIVER_MEN}  --executor-memory ${EXECUTOR_MEN}   --driver-cores ${DRIVER_CORES}  --executor-cores ${EXECUTOR_CORES}  --num-executors ${NUM_EXCUTORS}
 
 
-
+## 启动spark-historyserver
+cd ${SPARK_HOME}/sbin
+sh start-history-server.sh
 set +x

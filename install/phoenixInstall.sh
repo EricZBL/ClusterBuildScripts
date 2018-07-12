@@ -50,8 +50,8 @@ done
 
 ## 解压phoenix tar 包
 cd ${SOURCE_DIR}
-rm -rf phoenix
-tar -xf phoenix.tar.gz
+#rm -rf phoenix
+#tar -xf phoenix.tar.gz
 
 ## 配置hbase-site.xml
 cd phoenix/bin

@@ -4,9 +4,9 @@
 ## Filename:    expectInstall.sh
 ## Description: 安装 expect 工具，安装后可以用expect命令减少人与linux之间的交互
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      lidiliang
-## Created:     2017-10-23
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-7-5
 ################################################################################
 
 #set -x
@@ -19,6 +19,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展配置文件目录
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
@@ -26,13 +28,13 @@ LOG_FILE=${LOG_DIR}/expectInstall.log
 ## expect rpm 软件目录
 EXPECT_RPM_DIR=${ROOT_HOME}/component/basic_suports/expectRpm
 ## 基础工具安装路径
-INSTALL_HOME_BASIC=$(grep System_SuportDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+INSTALL_HOME_BASIC=$(grep System_SuportDir ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 ## expect rpm 软件最终目录
 EXPECT_RPM_INSTALL_HOME=${INSTALL_HOME_BASIC}/expectRpm
 ## expect的安装节点，集群所有主机名，放入数组中
-CLUSTER_HOSTNAME_LISTS=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+CLUSTER_HOSTNAME_LISTS=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 CLUSTER_HOSTNAME_ARRY=(${CLUSTER_HOSTNAME_LISTS//;/ })
-PASSWORD=$(grep SSH_Password ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+PASSWORD=$(grep SSH_Password ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;

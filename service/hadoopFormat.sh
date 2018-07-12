@@ -113,12 +113,12 @@ ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start namenode
 cd  ${INSTALL_HOME}/Hadoop/hadoop/
 echo formate  >> formated 
 
+##启动mr-historyserver(实现web查看作业的历史运行情况)
+echo "启动mr-historyserver" | tee -a $LOG_FILE
+${INSTALL_HOME}/Hadoop/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver 
+sleep 5s
 
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2) > /dev/null
 xcall jps
-
-
-
-
 
 

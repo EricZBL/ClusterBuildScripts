@@ -66,14 +66,14 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"   | tee -a $LOG_FILE
 
-echo “解压rocketmq zip 包中，请稍候.......”  | tee -a $LOG_FILE
-	unzip ${ROCKETMQ_SOURCE_DIR}/rocketmq.zip  -d ${ROCKETMQ_SOURCE_DIR} > /dev/null
-if [ $? == 0 ];then
-    echo "解压缩rocketmq 安装包成功......"  | tee -a $LOG_FILE
-else
-    echo “解压rocketmq 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
-	exit 1
-fi
+#echo “解压rocketmq zip 包中，请稍候.......”  | tee -a $LOG_FILE
+#	unzip ${ROCKETMQ_SOURCE_DIR}/rocketmq.zip  -d ${ROCKETMQ_SOURCE_DIR} > /dev/null
+#if [ $? == 0 ];then
+#    echo "解压缩rocketmq 安装包成功......"  | tee -a $LOG_FILE
+#else
+#    echo “解压rocketmq 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
+#	exit 1
+#fi
 
 for insName in ${Host_Arr[@]}
 do
@@ -119,9 +119,11 @@ do
         flag5=$?
         ssh root@$hostname "sed -i 's#^abortFile=.*#abortFile=${ROCKETMQ_ABORT}#g' ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${hostname}.properties"
         flag6=$?
-        ssh root@$hostname "sed -i 's#\${user.home}/logs#${ROCKETMQ_LOG}#g' ${ROCKETMQ_HOME}/conf/*.xml"
+        ssh root@$hostname "sed -i 's#\${user.home}/logs#${ROCKETMQ_LOG}\/rocketmq#g' ${ROCKETMQ_HOME}/conf/*.xml"
         flag7=$?
-        if [[ ($flag1 == 0)  && ($flag2 == 0)  &&  ($flag3 == 0)  && ($flag4 == 0)  &&  ($flag5 == 0)  && ($flag6 == 0)  && ($flag7 == 0) ]];then
+		ssh root@$hostname "sed -i '$a\brokerIP1=172.18.18.103' ${ROCKETMQ_HOME}/conf/broker.conf"
+		flag8=$?
+        if [[ ($flag1 == 0)  && ($flag2 == 0)  &&  ($flag3 == 0)  && ($flag4 == 0)  &&  ($flag5 == 0)  && ($flag6 == 0)  && ($flag7 == 0) && ($flag8 == 0) ]];then
             echo " 配置brokerproperties完成." | tee -a $LOG_FILE
         else
             echo "配置brokerproperties失败." | tee -a $LOG_FILE

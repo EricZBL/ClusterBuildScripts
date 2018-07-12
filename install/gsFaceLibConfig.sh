@@ -3,9 +3,9 @@
 ## Copyright:   HZGOSUN Tech. Co, BigData
 ## Filename:    gsFaceLibConfig.sh
 ## Description: 配置算法库.
-## Version:     1.0
-## Author:      mashencai
-## Created:     2017-11-16
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28 
 ################################################################################
 
 #set -x
@@ -150,7 +150,7 @@ function remove_snini(){
 #####################################################################
 function main()
 {
-    compression_the_tar
+    #compression_the_tar
     rsync_GsFaceLib
     add_env
     remove_snini

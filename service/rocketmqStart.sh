@@ -60,7 +60,7 @@ else
     echo  -e 'RocketMQ UI 配置失败 \n'
 fi
 
-# 等待三秒后再验证RocketMq是否启动成功
+# 等待五秒后再验证RocketMq是否启动成功
 echo -e "********************验证RocketMq是否启动成功*********************"
 sleep 5s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)

@@ -1,12 +1,12 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    elasticInstall.sh
-## Delasticcription: 安装配置elastic
+## Filename:    expand_elasticsearch.sh
+## Delasticcription: 扩展安装配置elastic
 ##              实现自动化的脚本
 ## Version:     2.0
 ## Author:      zhangbaolin
-## Created:     2018-06-28 
+## Created:     2018-06-28
 ################################################################################
 
 #set -x
@@ -38,6 +38,9 @@ ELASTIC_INSTALL_HOME=${INSTALL_HOME}/Elastic
 ELASTIC_HOME=${ELASTIC_INSTALL_HOME}/elastic
 ## JAVA_HOME
 JAVA_HOME=${INSTALL_HOME}/JDK/jdk
+## 集群扩展的节点
+EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
 
 ## 获取es的安装节点，放入数组中
 ES_HOSTNAME_LISTS=$(grep ES_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
@@ -51,28 +54,6 @@ mkdir -p ${ELASTIC_HOME}
 #                              定义函数                                #
 #---------------------------------------------------------------------#
 
-
-#####################################################################
-# 函数名: compression_the_tar
-# 描述: 在本机上解压 elastic 安装包
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function compression_the_tar()
-{
-	echo ""  | tee -a $LOG_FILE
-	echo "**********************************************" | tee -a $LOG_FILE
-	echo "please waitinng, elastic jar 包解压中........"  | tee -a $LOG_FILE
-	cd ${ELASTIC_SOURCE_DIR}  ## 进入 elastic 安装包目录
-	tar -xf elastic.tar.gz  ## 解压 elastic 安装包
-	if [ $? == 0 ];then  ## 判断返回值
-		echo "解压elastic jar 包成功." | tee -a $LOG_FILE
-	else
-	   echo "解压elastic jar 包失败，请检查包是否完整。" | tee -a $LOG_FILE  
-	fi
-	cd - 
-}
 
 #####################################################################
 # 函数名: config_yml_hostnamelist
@@ -98,11 +79,11 @@ function config_yml_hostnamelist()
 	tmp=${tmp%?}
 
 	#替换discovery.zen.ping.unicast.hosts字段的值
-    sed -i "s#^discovery.zen.ping.unicast.hosts:.*#discovery.zen.ping.unicast.hosts: [${tmp}]#g" ${ELASTIC_SOURCE_DIR}/elastic/config/elasticsearch.yml
+    sed -i "s#^discovery.zen.ping.unicast.hosts:.*#discovery.zen.ping.unicast.hosts: [${tmp}]#g" ${ELASTIC_INSTALL_HOME}/elastic/config/elasticsearch.yml
 
 	echo "修改discovery.zen.ping.unicast.hosts:[${tmp}]成功"  | tee -a $LOG_FILE
 	echo ""  | tee -a $LOG_FILE
-		
+
 	cd -
 }
 
@@ -117,14 +98,19 @@ function rsync_file(){
 
 	echo ""  | tee -a $LOG_FILE
 	echo "**********************************************" | tee -a $LOG_FILE
-	echo "please waitinng, 解压后安装文件夹分发中........"  | tee -a $LOG_FILE
-	for hostname in ${ES_HOSTNAME_ARRY[@]};do
-		ssh root@${hostname}  "mkdir -p ${ELASTIC_INSTALL_HOME}"  
+	echo "please waitinng, 安装文件夹分发中........"  | tee -a $LOG_FILE
+	for hostname in ${EXPEND_NODE_ARRY[@]};do
+		ssh root@${hostname}  "mkdir -p ${ELASTIC_INSTALL_HOME}"
 		rsync -rvl ${ELASTIC_SOURCE_DIR}/elastic   root@${hostname}:${ELASTIC_INSTALL_HOME}  >/dev/null
 		ssh root@${hostname}  "chmod -R 755   ${ELASTIC_INSTALL_HOME}"  ## 修改拷过去的文件夹权限为可执行
 	done
+
+	for hostname in ${EXPEND_NODE_ARRY[@]};do
+		rsync -rvl ${ELASTIC_INSTALL_HOME}/elastic/config/elasticsearch.yml   root@${hostname}:${ELASTIC_INSTALL_HOME}/elastic/config/  >/dev/null
+		ssh root@${hostname}  "chmod -R 755   ${ELASTIC_INSTALL_HOME}"  ## 修改拷过去的文件夹权限为可执行
+	done
 	cd -
-	echo "分发elastic 解压后的 tar包done..."  | tee -a $LOG_FILE  
+	echo "分发elastic done..."  | tee -a $LOG_FILE
 	echo "**********************************************" | tee -a $LOG_FILE
 	echo "" | tee -a $LOG_FILE
 }
@@ -143,16 +129,16 @@ function config_yml_hostandIP(){
 	echo "**********************************************" | tee -a $LOG_FILE
 	echo "每个节点上配置elasticsearch.yml中的node.name和network.host........"  | tee -a $LOG_FILE
 	for hostname in ${ES_HOSTNAME_ARRY[@]};do
-		
+
 		## 配置elasticsearch.yml中的node.name为当前节点的主机名
 		ssh root@${hostname} "sed -i 's#^node.name:.*#node.name: ${hostname}#g' ${ELASTIC_HOME}/config/elasticsearch.yml"
 		echo "修改node.name:${hostname}成功"  | tee -a $LOG_FILE
-		
+
 		## 获取每个节点的IP
 		ip=$(cat /etc/hosts|grep "$hostname" | awk '{print $1}')
 		## 配置elasticsearch.yml中的network.host为当前节点的IP
 		ssh root@${hostname} "sed -i 's#^network.host:.*#network.host: ${ip}#g' ${ELASTIC_HOME}/config/elasticsearch.yml"
-		
+
 		echo "修改${hostname}的network.host成功"  | tee -a $LOG_FILE
 	done
 	cd -
@@ -180,7 +166,7 @@ function move_file()
 	echo "移动etc_security_limits.d_90-nproc.conf 到 目录/etc/security/limits.d/90-nproc.conf下......"    | tee -a $LOG_FILE
 	echo "移动etc_sysctl.conf 到 目录/etc/sysctl.conf下......"    | tee -a $LOG_FILE
 	echo "" | tee -a $LOG_FILE
-	for hostname in ${ES_HOSTNAME_ARRY[@]};do
+	for hostname in ${EXPEND_NODE_ARRY[@]};do
 		ssh root@${hostname} "cp -f ${ELASTIC_HOME}/config/etc_security_limits.conf   /etc/security/limits.conf"
 		ssh root@${hostname} "cp -f ${ELASTIC_HOME}/config/etc_security_limits.d_90-nproc.conf   /etc/security/limits.d/90-nproc.conf"
 		ssh root@${hostname} "cp -f ${ELASTIC_HOME}/config/etc_sysctl.conf   /etc/sysctl.conf"
@@ -201,7 +187,6 @@ function move_file()
 #####################################################################
 function main()
 {
-#    compression_the_tar
     config_yml_hostnamelist
 	rsync_file
 	config_yml_hostandIP

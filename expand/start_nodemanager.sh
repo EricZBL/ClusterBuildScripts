@@ -2,10 +2,10 @@
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
 ## Filename:    hadoopStart.sh
-## Description: 启动hadoop集群的脚本.
-## Version:     1.0
-## Author:      qiaokaifeng
-## Created:     2017-10-24
+## Description: 启动集群扩展节点nodemanager服务的脚本.
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-7-12
 ################################################################################
 
 #set -x
@@ -25,37 +25,27 @@ LOG_FILE=${LOG_DIR}/hadoopStart.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 Hadoop_Masters=$(grep Hadoop_NameNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-namenode_arr=(${Hadoop_Masters//;/ }) 
+namenode_arr=(${Hadoop_Masters//;/ })
 MASTER1=${namenode_arr[0]}
 MASTER2=${namenode_arr[1]}
+## 集群扩展节点
+EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
 
 echo -e '启动Hadoop'
 
-${INSTALL_HOME}/Hadoop/hadoop/sbin/start-dfs.sh
+for node in ${EXPEND_NODE_ARRY[@]}
+do
+    ssh root@node "sh ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start nodemanager"
 	if [ $? -eq 0 ];then
 	    echo -e 'hdfs success \n'
-	else 
+	else
 	    echo -e 'hdfs failed \n'
 	fi
-${INSTALL_HOME}/Hadoop/hadoop/sbin/start-yarn.sh
-	if [ $? -eq 0 ];then
-	    echo -e 'yarn success \n'
-	else 
-	    echo -e 'yarn failed \n'
-	fi
-##启动jobhistory
-${INSTALL_HOME}/Hadoop/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver
-
-
-ssh root@$MASTER2 "${INSTALL_HOME}/Hadoop/hadoop/sbin/yarn-daemon.sh start resourcemanager"
-	if [ $? -eq 0 ];then
-	    echo -e 'ha yarn success \n'
-	else
-	    echo -e 'ha yarn failed \n'
-	fi
+done
 
 # 等待三秒后再验证Hadoop是否启动成功
-echo -e "********************验证Hadoop是否启动成功*********************"
+echo -e "********************验证NodeManager是否启动成功*********************"
 sleep 3s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-xcall jps | grep -E 'NameNode|NodeManager|DataNode|ResourceManager|JournalNode|DFSZKFailoverController|jps show as bellow'
+xcall jps | grep -E 'NodeManager|jps show as bellow'

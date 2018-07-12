@@ -5,9 +5,9 @@
 ## Description:  安装 hive
 ## Version:      1.0
 ## Hive.Version: 2.3.0 
-## Author:       qiaokaifeng
-## Reviser:      caodabao; mashencai
-## Created:      2017-11-14
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28 
 ################################################################################
 
 #set -x
@@ -49,14 +49,14 @@ echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 
 ## 解压hive安装包
-echo "==================================================="  | tee -a $LOG_FILE
-echo "解压hive tar 包中，请稍候......."  | tee -a $LOG_FILE
-tar -xf ${HIVE_SOURCE_DIR}/hive.tar.gz -C ${HIVE_SOURCE_DIR}
-if [ $? == 0 ];then
-    echo "解压缩hive 安装包成功......"  | tee -a $LOG_FILE
-else
-    echo "解压hive 安装包失败。请检查安装包是否损坏，或者重新安装."  | tee -a $LOG_FILE
-fi
+#echo "==================================================="  | tee -a $LOG_FILE
+#echo "解压hive tar 包中，请稍候......."  | tee -a $LOG_FILE
+#tar -xf ${HIVE_SOURCE_DIR}/hive.tar.gz -C ${HIVE_SOURCE_DIR}
+#if [ $? == 0 ];then
+#    echo "解压缩hive 安装包成功......"  | tee -a $LOG_FILE
+#else
+#    echo "解压hive 安装包失败。请检查安装包是否损坏，或者重新安装."  | tee -a $LOG_FILE
+#fi
 
 rm -rf  ${HIVE_INSTALL_HOME}
 mkdir -p ${HIVE_INSTALL_HOME}
@@ -68,7 +68,7 @@ sed -i "s;127.0.0.1;${MYSQL_INSTALLNODE};g" ${HIVE_HOME}/conf/hive-site.xml
 sed -i "s;INSTALL_HOME;${INSTALL_HOME};g" ${HIVE_HOME}/conf/hive-env.sh
 
 
-## 配置zookeeper、hive matestore集群地址（曹大报）
+## 配置zookeeper、hive matestore集群地址
 hazk=""
 hith=""
 for insName in ${HIVE_HOSTNAME_ARRY[@]}
@@ -79,9 +79,9 @@ done
     sed -i "s;hazkadd;${hazk%?};g"  ${HIVE_HOME}/conf/hive-site.xml
     sed -i "s;hithadd;${hith%?};g"  ${HIVE_HOME}/conf/hive-site.xml
 	
+	
 ####################################################################
 ##
-## （马燊偲）
 ## 修改/bin/beeline脚本，使Hive/bin/beeline在执行$>beeline命令时，
 ## 能直接进到jdbc:hive://s103:2181$>下；
 ## 可以自动读取节点的Ip，不需手动修改；
@@ -138,7 +138,7 @@ do
     ssh root@$insName "sed -i 's;hostname;$insName;g' ${HIVE_HOME}/conf/hive-site.xml"
 	
 done
-## 修改hiveserver2 UI地址（乔凯峰）
+## 修改hiveserver2 UI地址
 for insName in ${HIVE_HOSTNAME_ARRY[@]}
 do
     echo ""  | tee  -a  $LOG_FILE
@@ -151,7 +151,7 @@ done
     echo "hive 文件分发完成，安装完成......"  | tee  -a  $LOG_FILE
 
 	
-## 初始化元数据(曹大报)
+## 初始化元数据
 ssh root@${MYSQL_INSTALLNODE} "${HIVE_HOME}/bin/schematool -initSchema -dbType mysql"
 
 

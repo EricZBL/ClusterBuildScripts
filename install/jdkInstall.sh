@@ -4,9 +4,9 @@
 ## Filename:    mysqlInstall.sh
 ## Description: 安装并启动mysql。
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      lidiliang
-## Created:     2017-12-8 caodabao
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-29 
 ################################################################################
 
 #set -x
@@ -41,14 +41,14 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"   | tee -a $LOG_FILE
 
-echo “解压jdk tar 包中，请稍候.......”  | tee -a $LOG_FILE
-tar -xf ${JDK_SOURCE_DIR}/jdk.tar.gz -C $JDK_SOURCE_DIR
-if [ $? == 0 ];then
-    echo "解压缩jdk 安装包成功......"  | tee -a $LOG_FILE 
-else 
-    echo “解压jdk 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
-    exit 1
-fi
+#echo “解压jdk tar 包中，请稍候.......”  | tee -a $LOG_FILE
+#tar -xf ${JDK_SOURCE_DIR}/jdk.tar.gz -C $JDK_SOURCE_DIR
+#if [ $? == 0 ];then
+#    echo "解压缩jdk 安装包成功......"  | tee -a $LOG_FILE 
+#else 
+#    echo “解压jdk 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
+#    exit 1
+#fi
 
 
 ## 获取JDK分发节点
@@ -72,7 +72,7 @@ do
     echo "jdk 分发中,请稍候......"  | tee -a $LOG_FILE
     rsync -rvl $JDK_SOURCE_DIR/jdk $jdk_host:${JAVA_INSTALL_HOME}   > /dev/null
     ssh root@${jdk_host} "chmod -R 755 ${JAVA_INSTALL_HOME}"
-    ### 增加java环境变量，若先前有配置，要先删除原来的（马燊偲）
+    ### 增加java环境变量，若先前有配置，要先删除原来的
     ### ssh到每个节点，查找etc/profile中是否存在java系统变量行，若存在，则替换；若不存在，则追加。
     javahome_exists=$(ssh root@${jdk_host} 'grep "export JAVA_HOME=" /etc/profile')
     javapath_exists=$(ssh root@${jdk_host} 'grep "export PATH=\$JAVA_HOME" /etc/profile')

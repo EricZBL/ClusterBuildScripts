@@ -4,9 +4,9 @@
 ## Filename:    hadoopInstall.sh
 ## Description: 安装配置hadoop集群
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      lidiliang
-## Created:     2017-10-23 caodabao
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28 
 ################################################################################
 
 cd `dirname $0`
@@ -67,19 +67,20 @@ datanode_arr=(${Hadoop_Data//;/ })
 #####################################################################
 function compression_the_tar()
 {   
-    echo ""  | tee -a $LOG_FILE
-    echo "**********************************************" | tee -a $LOG_FILE
-    echo "please waitinng, hadoop jar 包解压中........"  | tee -a $LOG_FILE
-    cd $HADOOP_SOURCE_DIR
-    tar -xf hadoop.tar.gz
-    if [ $? == 0 ];then
-        echo "解压hadoop jar 包成功." | tee -a $LOG_FILE
-    else
-       echo "解压hadoop jar 包失败，请检查包是否完整。" | tee -a $LOG_FILE  
-    fi
-    rm -rf ${HADOOP_HOME}
-    #cp -r hadoop  ${HADOOP_INSTALL_HOME}
-    cd -  
+#    echo ""  | tee -a $LOG_FILE
+#    echo "**********************************************" | tee -a $LOG_FILE
+#    echo "please waitinng, hadoop jar 包解压中........"  | tee -a $LOG_FILE
+#    cd $HADOOP_SOURCE_DIR
+#    tar -xf hadoop.tar.gz
+     yes |cp -r ${HADOOP_SOURCE_DIR}/hive  ${HADOOP_INSTALL_HOME}
+#    if [ $? == 0 ];then
+#        echo "解压hadoop jar 包成功." | tee -a $LOG_FILE
+#    else
+#       echo "解压hadoop jar 包失败，请检查包是否完整。" | tee -a $LOG_FILE  
+#    fi
+#    rm -rf ${HADOOP_HOME}
+#    #cp -r hadoop  ${HADOOP_INSTALL_HOME}
+#    cd -  
 }
 
 
@@ -95,7 +96,7 @@ function config_jdk_and_slaves()
 {
     echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
-    cd ${HADOOP_SOURCE_DIR}/hadoop/etc/hadoop
+    cd ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop
     sed -i "s#java_home#${JAVA_HOME}#g" yarn-env.sh
     flag1=$?
     sed -i "s#java_home#${JAVA_HOME}#g" hadoop-env.sh
@@ -105,10 +106,10 @@ function config_jdk_and_slaves()
     else
         echo "配置jdk路径成功." | tee -a $LOG_FILE
     fi
-    echo ""  >  ${HADOOP_SOURCE_DIR}/hadoop/etc/hadoop/slaves
+    echo ""  >  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/slaves
     for data_host in ${datanode_arr[@]}
     do
-        echo ${data_host} >> ${HADOOP_SOURCE_DIR}/hadoop/etc/hadoop/slaves
+        echo ${data_host} >> ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/slaves
     done
     cd -
 }
@@ -125,9 +126,9 @@ function config_core_site()
 {
     echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
-    cd ${HADOOP_SOURCE_DIR}/hadoop/etc/hadoop
-    mkdir -p ${HADOOP_SOURCE_DIR}/hadoop/tmp/dfs/name
-    mkdir -p ${HADOOP_SOURCE_DIR}/hadoop/tmp/dfs/data
+    cd ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop
+    mkdir -p ${HADOOP_INSTALL_HOME}/hadoop/tmp/dfs/name
+    mkdir -p ${HADOOP_INSTALL_HOME}/hadoop/tmp/dfs/data
     sed -i "s#hadoop_tmp_dir#${HADOOP_TMP_DIR}#g" core-site.xml
     sed -i "s#ha_zookeeper_quorum#${ZK_LISTS}#g" core-site.xml    
     echo “配置core-site.xml 的配置done”  | tee -a $LOG_FILE
@@ -146,11 +147,11 @@ function config_hdfs_site()
 {
     echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
-    cd ${HADOOP_SOURCE_DIR}/hadoop/etc/hadoop
+    cd ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop
     sed -i "s#master1#${MASTER1}#g" hdfs-site.xml
     sed -i "s#master2#${MASTER2}#g" hdfs-site.xml
     sed -i "s#DKslave#${DK_SLAVES}#g" hdfs-site.xml 
-    mkdir -p ${HADOOP_SOURCE_DIR}/hadop/dfs_journalnode_edits_dir
+    mkdir -p ${HADOOP_INSTALL_HOME}/hadoop/dfs_journalnode_edits_dir
     sed -i "s#dfs_journalnode_edits_dir#${DFS_JOURNALNODE_EDITS_DIR}#g" hdfs-site.xml 
     echo “配置hdfs-site.xml 的配置done”  | tee -a $LOG_FILE
     cd -
@@ -167,7 +168,7 @@ function config_yarn_site()
 {
     echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
-    cd  ${HADOOP_SOURCE_DIR}/hadoop/etc/hadoop
+    cd  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop
     sed -i "s#master1#${MASTER1}#g"  yarn-site.xml
     sed -i "s#master2#${MASTER2}#g"  yarn-site.xml
     sed -i "s#ha_zookeeper_quorum#${ZK_LISTS}#g"  yarn-site.xml
@@ -194,11 +195,10 @@ function xync_hadoop_config()
     for host_name in ${host_arr[@]}
     do
         ssh root@$host_name  "rm -rf ${HADOOP_HOME}"  
-        rsync -rvl ${HADOOP_SOURCE_DIR}/hadoop   root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
+        rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop   root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
         ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
     done 
-    rm -rf  ${HADOOP_SOURCE_DIR}/hadoop
-    echo “分发haoop 安装配置done...”  | tee -a $LOG_FILE  
+    echo “分发hadoop 安装配置done...”  | tee -a $LOG_FILE  
 }
 
 #####################################################################
@@ -236,7 +236,7 @@ function writeUI_file()
 #####################################################################
 function main()
 {
-    compression_the_tar
+#    compression_the_tar
     config_jdk_and_slaves
     config_core_site
     config_hdfs_site
