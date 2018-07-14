@@ -40,4 +40,4 @@ rpm -ivh ${SSHPASS_RPM_DIR}/sshpass-1.06-1.el6.x86_64.rpm
 which sshpass
 
 set +x
-~
+

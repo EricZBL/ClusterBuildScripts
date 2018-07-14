@@ -41,7 +41,7 @@ fi
 if [ -d ${HADOOP_HOME}/tmp ];then
     for host in ${hostname_arr[@]}
     do 
-        ssh root@$host "rm -rf ${HADOOP_HOME}/tmp"
+        ssh root@$host "rm -rf ${HADOOP_HOME}/tmp/name/* ; rm -rf ${HADOOP_HOME}/tmp/data/*"
     done
 fi
 
@@ -64,12 +64,13 @@ sleep 5s
 for name_host in ${hostname_arr[@]}
 do
     ssh root@$name_host "${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start journalnode"
+    ssh root@$name_host "${INSTALL_HOME}/Hadoop/hadoop/bin/hdfs namenode -initializeSharedEdits"
     if [ $? -ne 0 ];then
         echo  "start journalnode in $name_host failed"
         exit 1 
     fi
 done
-sleep 2s
+sleep 5s
 
 # 格式化namenode
 echo "**********************************************" | tee -a $LOG_FILE
@@ -81,7 +82,7 @@ if [ $? -ne 0 ];then
     exit 1;
 fi
 
-sleep 2s
+sleep 5s
 
 ## 第一次启动
 echo "**********************************************" | tee -a $LOG_FILE

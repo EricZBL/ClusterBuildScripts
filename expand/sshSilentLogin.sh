@@ -4,8 +4,8 @@
 ## Filename:    sshSilentLogin.sh
 ## Description: 配置ssh 免密码登录
 ##              实现自动化的脚本
-## Version:     1.0
-## Author:      lidiliang
+## Version:     2.0
+## Author:      zhangbaolin
 ## Editor:      mashencai（修改读取密码的路径）
 ## Created:     2017-11-25
 ################################################################################

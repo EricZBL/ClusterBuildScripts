@@ -19,6 +19,7 @@ ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 
+cd ${BIN_DIR}
 ## 安装sshpass
 sh sshpassInstall.sh
 

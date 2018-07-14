@@ -70,17 +70,16 @@ function compression_the_tar()
 #    echo ""  | tee -a $LOG_FILE
 #    echo "**********************************************" | tee -a $LOG_FILE
 #    echo "please waitinng, hadoop jar 包解压中........"  | tee -a $LOG_FILE
-#    cd $HADOOP_SOURCE_DIR
+    cd $HADOOP_SOURCE_DIR
 #    tar -xf hadoop.tar.gz
-     yes |cp -r ${HADOOP_SOURCE_DIR}/hive  ${HADOOP_INSTALL_HOME}
 #    if [ $? == 0 ];then
 #        echo "解压hadoop jar 包成功." | tee -a $LOG_FILE
 #    else
 #       echo "解压hadoop jar 包失败，请检查包是否完整。" | tee -a $LOG_FILE  
 #    fi
-#    rm -rf ${HADOOP_HOME}
-#    #cp -r hadoop  ${HADOOP_INSTALL_HOME}
-#    cd -  
+    rm -rf ${HADOOP_HOME}
+    cp -r hadoop  ${HADOOP_INSTALL_HOME}
+    cd -  
 }
 
 
@@ -131,7 +130,7 @@ function config_core_site()
     mkdir -p ${HADOOP_INSTALL_HOME}/hadoop/tmp/dfs/data
     sed -i "s#hadoop_tmp_dir#${HADOOP_TMP_DIR}#g" core-site.xml
     sed -i "s#ha_zookeeper_quorum#${ZK_LISTS}#g" core-site.xml    
-    echo “配置core-site.xml 的配置done”  | tee -a $LOG_FILE
+    echo "配置core-site.xml 的配置done"  | tee -a $LOG_FILE
     cd -
 }
 
@@ -153,7 +152,7 @@ function config_hdfs_site()
     sed -i "s#DKslave#${DK_SLAVES}#g" hdfs-site.xml 
     mkdir -p ${HADOOP_INSTALL_HOME}/hadoop/dfs_journalnode_edits_dir
     sed -i "s#dfs_journalnode_edits_dir#${DFS_JOURNALNODE_EDITS_DIR}#g" hdfs-site.xml 
-    echo “配置hdfs-site.xml 的配置done”  | tee -a $LOG_FILE
+    echo "配置hdfs-site.xml 的配置done"  | tee -a $LOG_FILE
     cd -
 }
 
@@ -172,7 +171,7 @@ function config_yarn_site()
     sed -i "s#master1#${MASTER1}#g"  yarn-site.xml
     sed -i "s#master2#${MASTER2}#g"  yarn-site.xml
     sed -i "s#ha_zookeeper_quorum#${ZK_LISTS}#g"  yarn-site.xml
-    echo “配置yarn-site.xml 的配置done”  | tee -a $LOG_FILE
+    echo "配置yarn-site.xml 的配置done"  | tee -a $LOG_FILE
     cd -
 }
 
@@ -194,11 +193,11 @@ function xync_hadoop_config()
     host_arr=(${CLUSTER_HOST//;/ })    
     for host_name in ${host_arr[@]}
     do
-        ssh root@$host_name  "rm -rf ${HADOOP_HOME}"  
+        #ssh root@$host_name  "rm -rf ${HADOOP_HOME}"
         rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop   root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
         ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
     done 
-    echo “分发hadoop 安装配置done...”  | tee -a $LOG_FILE  
+    echo "分发hadoop 安装配置done..."  | tee -a $LOG_FILE
 }
 
 #####################################################################
@@ -236,7 +235,7 @@ function writeUI_file()
 #####################################################################
 function main()
 {
-#    compression_the_tar
+    compression_the_tar
     config_jdk_and_slaves
     config_core_site
     config_hdfs_site

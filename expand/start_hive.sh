@@ -50,8 +50,6 @@ do
 	ssh root@$name "if [ ! -x '${HIVE_LOG_FILE}' ]; then touch '${HIVE_LOG_FILE}' ;fi"
 done
 
-# （马燊偲）
-
 for name in ${EXPEND_NODE_ARRY[@]}
 do
 	# 判断Hive是否已经启动：进程中是否已经有runjar，假如有的话，不启动HiveServer和Hivemetastore

@@ -43,6 +43,7 @@ for rpm_pak in $(cat  mysql.tmp);do
     echo "==================================================="  | tee -a $LOG_FILE
     echo "删除原先系统mysql rpm 软件包: ${rpm_pak}"  |  tee  -a  $LOG_FILE
     rpm -e --nodeps ${rpm_pak}
+    rm -rf /var/lib/mysql/
 done
 rm -rf mysql.tmp
 

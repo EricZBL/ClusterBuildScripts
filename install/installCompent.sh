@@ -19,14 +19,10 @@ ROOT_HOME=`pwd`
 ##配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 
-SELINUX=/usr/sbin/sestatus –v | grep 'SELinux status' | cut -d ':' -f2 | tr -d " "
-if [ "x$SELINUX" == "xenabled"  ] ; then
-    echo "SELINUX 状态为enabled，请手动关闭后再进行组件安装"
-	exit 1
-else
-    echo "SELINUX 状态为disable，开始安装组件"
-fi
+#检查selinux状态
+sh selinuxStatus.sh
 
+cd ${BIN_DIR}
 ##安装mysql
 sh mysqlInstall.sh
 

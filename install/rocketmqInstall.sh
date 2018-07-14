@@ -93,16 +93,16 @@ do
         ssh root@${insName} "echo export NAMESRV_ADDR="${NameServer_IP}:9876"  >> /etc/profile; echo "">> /etc/profile"		
     fi
 done
-rm -rf ${ROCKETMQ_SOURCE_DIR}/rocketmq
+
 
 ##修改${ROCKETMQ_HOME}/conf/2m-noslave/目录下broker配置文件
 for hostname in ${Host_Arr[@]}
 do
     echo "************************************************"
-    echo "准备修改$hostname节点下的broker配置文件："  | tee -a $LOG_FILE
+    echo "准备修改${hostname}节点下的broker配置文件："  | tee -a $LOG_FILE
     Properties_Num=$(ssh root@$hostname "ls ${ROCKETMQ_HOME}/conf/2m-noslave | grep .properties | wc -l")
     if [ $Properties_Num != 1 ];then
-        echo "$hostname节点下的broker配置文件数目不为1,请检视......"  | tee -a $LOG_FILE
+        echo "${hostname}节点下的broker配置文件数目不为1,请检视......"  | tee -a $LOG_FILE
         exit 0
     else
         ssh root@$hostname "mv ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${hostname}.properties" 
@@ -121,7 +121,7 @@ do
         flag6=$?
         ssh root@$hostname "sed -i 's#\${user.home}/logs#${ROCKETMQ_LOG}\/rocketmq#g' ${ROCKETMQ_HOME}/conf/*.xml"
         flag7=$?
-		ssh root@$hostname "sed -i '$a\brokerIP1=172.18.18.103' ${ROCKETMQ_HOME}/conf/broker.conf"
+		 ssh root@$hostname "sed -i 's#brokerIP1=#brokerIP1=${hostname}#g' ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${hostname}.properties"
 		flag8=$?
         if [[ ($flag1 == 0)  && ($flag2 == 0)  &&  ($flag3 == 0)  && ($flag4 == 0)  &&  ($flag5 == 0)  && ($flag6 == 0)  && ($flag7 == 0) && ($flag8 == 0) ]];then
             echo " 配置brokerproperties完成." | tee -a $LOG_FILE
@@ -129,7 +129,7 @@ do
             echo "配置brokerproperties失败." | tee -a $LOG_FILE
         fi
     fi
-    echo "修改$hostname节点下的broker配置文件完成"  | tee -a $LOG_FILE
+    echo "修改${hostname}节点下的broker配置文件完成"  | tee -a $LOG_FILE
 done
 
 ## 将RocketMQ的UI地址写到指定文件中

@@ -31,7 +31,7 @@ EXPECT_RPM_DIR=${ROOT_HOME}/component/basic_suports/expectRpm
 INSTALL_HOME_BASIC=$(grep System_SuportDir ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 ## expect rpm 软件最终目录
 EXPECT_RPM_INSTALL_HOME=${INSTALL_HOME_BASIC}/expectRpm
-## expect的安装节点，集群所有主机名，放入数组中
+## expect的安装节点，集群扩展的节点ip，放入数组中
 CLUSTER_HOSTNAME_LISTS=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 CLUSTER_HOSTNAME_ARRY=(${CLUSTER_HOSTNAME_LISTS//;/ })
 PASSWORD=$(grep SSH_Password ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2)

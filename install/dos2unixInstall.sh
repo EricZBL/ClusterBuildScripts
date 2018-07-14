@@ -63,7 +63,7 @@ done
 ##把执行脚本的节点上的脚本转成unix编码
 dos2unix ${ROOT_HOME}/conf/*
 dos2unix ${ROOT_HOME}/service/*
-dos2unix ${ROOT_HOME}/expend/*
+dos2unix ${ROOT_HOME}/expand/*
 dos2unix ${ROOT_HOME}/install/*
 echo "转换脚本编码格式完成" | tee -a $LOG_FILE
 
