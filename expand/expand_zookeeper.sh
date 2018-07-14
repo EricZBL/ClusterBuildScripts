@@ -44,6 +44,9 @@ ZOO_CFG_FILE=${ZOOKEEPER_CONF}/zoo.cfg
 ZOOKEEPER_DATA=${ZOOKEEPER_HOME}/data
 ## zookeeper myid 文件
 ZOOKEEPER_MYID=${ZOOKEEPER_DATA}/myid
+##
+NUM=$(sed -n '$p' ${ZOO_CFG_FILE} | cut -d '.' -f2 | cut -d '=' -f1)
+NUMBER=${NUM}+1
 
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
@@ -66,8 +69,12 @@ function zoo_cfg ()
 {
 for insName in ${HOSTNAMES[@]}
 do
-    ## 修改 zoo.cfg
-    echo "server.${NUMBER}=${insName}:2888:3888" >> ${ZOO_CFG_FILE}
+    value1=$(grep "server.${NUMBER}"  ${ZOO_CFG_FILE})
+    if [ -n "${value1}" ];then
+        sed -i "s#server.${NUMBER}=.*#server.${NUMBER}=${insName}:2888:3888#g"  ${ZOO_CFG_FILE}
+    else
+        echo "server.${NUMBER}=${insName}:2888:3888" >> ${ZOO_CFG_FILE}
+    fi
 
     NUMBER=$((${NUMBER}+1))
 done
@@ -100,8 +107,7 @@ done
 # 返回值: N/A
 # 其他: N/A
 #####################################################################
-NUM=$(sed -n '$p' ${ZOO_CFG_FILE} | cut -d '.' -f2 | cut -d '=' -f1)
-NUMBER=${NUM}+1
+
 function myid ()
 {
 for insName in ${HOSTNAMES[@]}

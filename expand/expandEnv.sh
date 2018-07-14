@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    installEnv.sh
+## Filename:    expandEnv.sh
 ## Description: 安装环境的脚本.
 ## Version:     2.0
 ## Author:      zhangbaolin
@@ -20,8 +20,6 @@ ROOT_HOME=`pwd`
 CONF_DIR=${ROOT_HOME}/conf
 
 cd ${BIN_DIR}
-## 安装sshpass
-sh sshpassInstall.sh
 
 ## 安装dos2unix
 sh dos2unixInstall.sh
