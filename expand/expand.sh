@@ -28,6 +28,8 @@ LOG_FILE=${LOG_DIR}/synConf.log
 EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
+cd ${BIN_DIR}
+
 function main() 
 {
     #修改主配置文件Cluster_HostName的值

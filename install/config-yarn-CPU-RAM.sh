@@ -61,14 +61,14 @@ function config_yarn ()
 {
     echo ""  | tee -a $LOG_FILE
     echo "****************************************************"  | tee -a $LOG_FILE
-    echo “正在配置yarn的内存与CPU，请稍候.......”  | tee -a $LOG_FILE
+    echo "正在配置yarn的内存与CPU，请稍候......."  | tee -a $LOG_FILE
     echo "获取当前机器配置信息:cores=${CORES},MEMORY=${MEMORY},DISKS=${DISKS},HBASE=${HBASE}"
     python yarn-utils.py -c ${CORES} -m ${MEMORY} -d ${DISKS} -k ${HBASE} > ${BIN_DIR}/chenke.sb  | tee -a $LOG_FILE
     echo "${BIN_DIR}/chenke.sb文件内容:"  | tee -a $LOG_FILE
     echo "----------------------------------------------------"  | tee -a $LOG_FILE
     cat ${BIN_DIR}/chenke.sb  | tee -a $LOG_FILE
     echo "----------------------------------------------------"  | tee -a $LOG_FILE
-    echo “配置yarn完成!!!!!!”  | tee -a $LOG_FILE
+    echo "配置yarn完成!!!!!!"  | tee -a $LOG_FILE
 }
 
 #####################################################################
@@ -83,7 +83,7 @@ function config_yarn_site_xml ()
     echo ""  | tee -a $LOG_FILE
     echo "****************************************************"  | tee -a $LOG_FILE
 	cd ${YARN_SITE_XML_DIR}
-	echo “进入${YARN_SITE_XML_DIR}目录，准备配置yarn-site.xml”  |  tee -a $LOG_FILE
+	echo "进入${YARN_SITE_XML_DIR}目录，准备配置yarn-site.xml"  |  tee -a $LOG_FILE
 	if [ -f "${YARN_SITE_XML}" ]; then
 		## 配置yarn nodeManager 可以支配的最大内存
 		grep -q "yarn.nodemanager.resource.memory-mb" ${YARN_SITE_XML}
@@ -100,7 +100,7 @@ function config_yarn_site_xml ()
         else
 		echo "Not Found \"${YARN_SITE_XML_DIR}\" or \"${BIN_DIR}/chenke.sb\" file!"  |  tee -a $LOG_FILE
 	fi
-	echo “配置yarn-site.xml完成!!!!!!”  | tee -a $LOG_FILE
+	echo "置yarn-site.xml完成!!!!!!"  | tee -a $LOG_FILE
 }
 
 #####################################################################

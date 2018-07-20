@@ -65,12 +65,16 @@ MASTER2=${namenode_arr[1]}
 ##获取数据存储节点节点
 Hadoop_Data=$(grep Hadoop_DataNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 datanode_arr=(${Hadoop_Data//;/ })
+HADOOP_IP_LISTS=${Hadoop_Data}
+for node in ${namenode_arr};do
+    if [[ ${Hadoop_Data} =~ ${node} ]]; then
+        echo "###########"
+    else
+        HADOOP_IP_LISTS=$(${Hadoop_Data}\;${node})
 
-HADOOP_IP_LISTS=${Hadoop_Masters}";"${Hadoop_Data}
+    fi
+done
 HADOOP_IP_ARRY=(${HADOOP_IP_LISTS//;/ })
-
-
-
 
 #####################################################################
 # 函数名: config_conf_slaves
@@ -113,12 +117,14 @@ function xync_hadoop()
     do
         ssh root@$host_name  "rm -rf ${HADOOP_HOME}"
         rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop  root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
+        rm -rf ${HADOOP_INSTALL_HOME}/hadoop/tmp/dfs/data/*
         ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
     done
     for host_name in ${host_arr[@]}
     do
         scp  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/core-site.xml  root@${host_name}:${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/
         scp  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/yarn-site.xml  root@${host_name}:${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/
+        scp  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/slaves root@${host_name}:${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/
         ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
     done
     #rm -rf  ${HADOOP_SOURCE_DIR}/hadoop

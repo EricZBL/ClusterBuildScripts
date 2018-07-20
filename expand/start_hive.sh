@@ -18,6 +18,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展集群配置文件目录
+EXPAND_CONF_DIR=${BIN_DIR}/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录

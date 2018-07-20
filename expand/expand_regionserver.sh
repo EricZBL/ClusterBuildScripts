@@ -34,6 +34,7 @@ INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '
 HBASE_HMASTER=$(grep HBase_Hmaster ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 HBASE_HREGIONSERVER=$(grep HBase_HRegionServer ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 
+
 if [[ ${HBASE_HREGIONSERVER} =~ ${HBASE_HMASTER} ]]; then
     HBASE_HOSTNAME_ARRY=(${HBASE_HREGIONSERVER//;/ })
 else

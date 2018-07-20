@@ -69,7 +69,7 @@ sh create-global-env.sh
 sh logconfig.sh
 
 ##根据集群类型修改yarn参数
-ISMINICLUSTER=${grep "ISMINICLUSTER" ${CONF_DIR}/cluster_conf.properties | cut -d '=' -f2}
+ISMINICLUSTER=$(grep "ISMINICLUSTER" ${CONF_DIR}/cluster_conf.properties | cut -d '=' -f2)
 if [ "x${ISMINICLUSTER}" == "xno"  ]; then
     sh config-yarn-CPU-RAM.sh
 else

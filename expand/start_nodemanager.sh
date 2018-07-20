@@ -18,6 +18,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展集群配置文件目录
+EXPAND_CONF_DIR=${BIN_DIR}/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
@@ -36,11 +38,11 @@ echo -e '启动Hadoop'
 
 for node in ${EXPAND_NODE_ARRY[@]}
 do
-    ssh root@node "sh ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start nodemanager"
+    ssh root@$node "sh ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start nodemanager"
 	if [ $? -eq 0 ];then
-	    echo -e 'hdfs success \n'
+	    echo -e 'yarn success \n'
 	else
-	    echo -e 'hdfs failed \n'
+	    echo -e 'yarn failed \n'
 	fi
 done
 

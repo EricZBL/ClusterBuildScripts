@@ -56,6 +56,7 @@ function main()
         done
         echo "统计nodemanager个数"
         NODEMANAGER=$(grep Yarn_NodeManager ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
+        NODEMANAGER=(${NODEMANAGER//;/ })
         EXPAND_NUM=${#NODEMANAGER[@]}
         sed -i "s#Yarn_NumOfNodeManger=.*#Yarn_NumOfNodeManger=$EXPAND_NUM#g" ${ROOT_HOME}/conf/cluster_conf.properties
         echo "扩展后nodemanager为 $EXPAND_NUM 个"
