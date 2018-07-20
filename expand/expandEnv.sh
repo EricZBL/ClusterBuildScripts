@@ -22,19 +22,19 @@ CONF_DIR=${ROOT_HOME}/conf
 cd ${BIN_DIR}
 
 ## 安装dos2unix
-sh dos2unixInstall.sh
+sh dos2unixExpand.sh
 
 ## 安装expect
-sh expectInstall.sh
+sh expectExpand.sh
 
 ## 配置免密登录
 sh sshSilentLogin.sh
 
 ## 分发host
-sh ../tool/xsync /etc/hosts
+sh ${ROOT_HOME}/tool/xsync /etc/hosts
 
 ## 删除环境变量
-sh delete_env_variable.sh
+sh delete_env_variable_expand.sh
 
 ## 关闭防火墙
-sh offIptables.sh
+sh offIptables_expand.sh

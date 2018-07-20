@@ -41,16 +41,6 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"   | tee -a $LOG_FILE
 
-#echo “解压jdk tar 包中，请稍候.......”  | tee -a $LOG_FILE
-#tar -xf ${JDK_SOURCE_DIR}/jdk.tar.gz -C $JDK_SOURCE_DIR
-#if [ $? == 0 ];then
-#    echo "解压缩jdk 安装包成功......"  | tee -a $LOG_FILE 
-#else 
-#    echo “解压jdk 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
-#    exit 1
-#fi
-
-
 ## 获取JDK分发节点
 CLUSTER_HOST=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 jdkhost_arr=(${CLUSTER_HOST//;/ })    
@@ -59,8 +49,8 @@ do
     echo ""  | tee  -a  $LOG_FILE
     echo "************************************************"
     echo "准备将JDK分发到节点$jdk_host："  | tee -a $LOG_FILE
-    ssh root@$jdk_host "source /etc/profile; mkdir -p  ${JAVA_INSTALL_HOME};"
-    ssh root@$jdk_host 'mkdir /home/test;
+    ssh root@${jdk_host} "source /etc/profile; mkdir -p  ${JAVA_INSTALL_HOME};"
+    ssh root@${jdk_host} 'mkdir /home/test;
         cd /home/test;
         rpm -qa | grep java   > java.tmp;
         for rpm_pak in $(cat  java.tmp);do

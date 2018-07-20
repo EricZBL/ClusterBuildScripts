@@ -33,7 +33,7 @@ sh expectInstall.sh
 sh sshSilentLogin.sh
 
 ## 分发host
-sh ../tool/xsync /etc/hosts
+sh ${ROOT_HOME}/tool/xsync /etc/hosts
 
 ## 删除环境变量
 sh delete_env_variable.sh

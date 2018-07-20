@@ -29,8 +29,8 @@ INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '
 ES_HOSTNAME_LISTS=$(grep ES_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ES_HOSTNAME_ARRY=(${ES_HOSTNAME_LISTS//;/ })
 ## 集群扩展节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 ## ELASTIC_INSTALL_HOME elastic 安装目录：/opt/hzgc/bigdata/Elastic
 ELASTIC_INSTALL_HOME=${INSTALL_HOME}/Elastic
@@ -56,7 +56,7 @@ echo "开始启动ES服务......"    | tee -a $LOG_FILE
 
 # 创建elsearch用户
 echo -e "在每个节点上创建elsearch用户："              | tee -a $LOG_FILE
-for name in ${EXPEND_NODE_ARRY[@]};do
+for name in ${EXPAND_NODE_ARRY[@]};do
     ssh root@$name "groupadd elsearch;useradd elsearch -g elsearch -p elastic;chown -R elsearch:elsearch ${ELASTIC_HOME}"
 done
 echo "" | tee -a $LOG_FILE
@@ -65,7 +65,7 @@ echo "" | tee -a $LOG_FILE
 
 # 启动ES
 echo "**********************************************" | tee -a $LOG_FILE
-for name in ${EXPEND_NODE_ARRY[@]};do
+for name in ${EXPAND_NODE_ARRY[@]};do
     echo -e "启动${name}节点下ES..."                    | tee -a $LOG_FILE
 	ssh root@$name "chmod 777 /tmp" #修改tmp目录的权限，不修改会报错
     ssh root@$name "source /etc/profile;su -c '${ELASTIC_HOME}/bin/elasticsearch -d' elsearch" # 切换为elsearch用户

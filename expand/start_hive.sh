@@ -39,18 +39,18 @@ HIVE_HIVERSERVER2_LOG=${HIVE_LOG_PATH}/hiveserver2.log
 HIVE_HOSTNAME_LISTS=$(grep Meta_ThriftServer ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 HIVE_HOSTNAME_ARRY=(${HIVE_HOSTNAME_LISTS//;/ })
 ## 集群扩展节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 
 # 创建日志目录
-for name in ${EXPEND_NODE_ARRY[@]}
+for name in ${EXPAND_NODE_ARRY[@]}
 do
 	ssh root@$name "if [ ! -x '${HIVE_LOG_PATH}' ]; then mkdir -p '${HIVE_LOG_PATH}' ; fi"
 	ssh root@$name "if [ ! -x '${HIVE_LOG_FILE}' ]; then touch '${HIVE_LOG_FILE}' ;fi"
 done
 
-for name in ${EXPEND_NODE_ARRY[@]}
+for name in ${EXPAND_NODE_ARRY[@]}
 do
 	# 判断Hive是否已经启动：进程中是否已经有runjar，假如有的话，不启动HiveServer和Hivemetastore
 	hive_start=$(ssh root@${name} "source /etc/profile;jps | grep RunJar | grep -v grep | gawk '{print $1}'")

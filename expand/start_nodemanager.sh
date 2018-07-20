@@ -29,12 +29,12 @@ namenode_arr=(${Hadoop_Masters//;/ })
 MASTER1=${namenode_arr[0]}
 MASTER2=${namenode_arr[1]}
 ## 集群扩展节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 echo -e '启动Hadoop'
 
-for node in ${EXPEND_NODE_ARRY[@]}
+for node in ${EXPAND_NODE_ARRY[@]}
 do
     ssh root@node "sh ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start nodemanager"
 	if [ $? -eq 0 ];then

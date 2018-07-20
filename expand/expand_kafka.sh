@@ -191,7 +191,7 @@ do
     ## 修改 log.dirs
     echo "正在修改${insName}的 log.dirs ..." | tee -a $LOG_FILE
     value3=`ssh root@${insName} "grep 'log.dirs' ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2"`
-    sh root@${insName} "sed -i 's#log.dirs=${value3}#log.dirs=${LOG_DIRS}#g' ${KAFKA_SERVER_PROPERTIES}"
+    ssh root@${insName} "sed -i 's#log.dirs=${value3}#log.dirs=${LOG_DIRS}#g' ${KAFKA_SERVER_PROPERTIES}"
     echo "${insName}的 log.dirs 配置修改完毕！！！" | tee -a $LOG_FILE
     num=$(($num+1))
 done

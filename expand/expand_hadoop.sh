@@ -16,6 +16,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展集群配置文件目录
+EXPAND_CONF_DIR=${BIN_DIR}/conf
 ## 日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## hadoop 安装日记
@@ -35,8 +37,8 @@ VALUE="<value>"
 ## </value>
 VALUE_END="</value>"
 ## 集群扩展的节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 mkdir -p ${HADOOP_HOME}
 
@@ -107,7 +109,7 @@ function xync_hadoop()
     echo "hadoop 配置文件分发中，please waiting......"    | tee -a $LOG_FILE
     CLUSTER_HOST=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
     host_arr=(${CLUSTER_HOST//;/ })
-    for host_name in ${EXPEND_NODE_ARRY[@]}
+    for host_name in ${EXPAND_NODE_ARRY[@]}
     do
         ssh root@$host_name  "rm -rf ${HADOOP_HOME}"
         rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop  root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null

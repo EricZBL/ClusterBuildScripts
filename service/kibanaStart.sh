@@ -1,11 +1,12 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    create-global-env.sh
-## Description: 配置环境变量和服务启动目录。
-## Version:     1.0
-## Author:      lidiliang
-## Created:     2017-10-23
+## Filename:    kibanaInstall.sh
+## Description: 安装并启动kibana。
+##              实现自动化的脚本
+## Version:     2.0
+## Author:      zhangbaolin
+## Created:     2018-06-28
 ################################################################################
 
 #set -x
@@ -21,15 +22,22 @@ CONF_DIR=${ROOT_HOME}/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
-LOG_FILE=${LOG_DIR}/create-global-env.log
+LOG_FILE=${LOG_DIR}/kibanaInstall.log
+## kibana 安装包目录
+KIBANA_SOURCE_DIR=${ROOT_HOME}/component/bigdata
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-## 集群所有节点主机名，放入数组中
-CLUSTER_HOSTNAME_LISTS=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-CLUSTER_HOSTNAME_ARRY=(${CLUSTER_HOSTNAME_LISTS//;/ })
+## hive的安装节点，放入数组中
+KIBANA_NODE=$(grep Kibana_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+
+## HIVE_INSTALL_HOME hive 安装目录
+KIBANA_INSTALL_HOME=${INSTALL_HOME}/Kibana
+## HIVE_HOME  hive 根目录
+KIBANA_HOME=${INSTALL_HOME}/Kibana/kibana
 
 
 if [ ! -d $LOG_DIR ];then
+    echo "创建安装日志目录"
     mkdir -p $LOG_DIR;
 fi
 
@@ -38,16 +46,13 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 
-cp ${ROOT_HOME}/service/temporary_environment_variable.sh  ${ROOT_HOME}/env_bigdata.sh
-for host in ${CLUSTER_HOSTNAME_ARRY[@]}
-do
-    echo "scp configuration to node ${host}"
-    scp  -r ${ROOT_HOME}/service  ${ROOT_HOME}/conf ${ROOT_HOME}/tool ${ROOT_HOME}/expand env_bigdata.sh root@${host}:/opt/hzgc  > /dev/null
-	ssh root@${host}  "chmod -R 755 /opt/hzgc"
-done
+## 启动kibana
+cd ${KIBANA_INSTALL_HOME}
+
+echo "启动kibana"
+ ./kibana > /dev/null &
 
 
-
+main
 
 set +x
-

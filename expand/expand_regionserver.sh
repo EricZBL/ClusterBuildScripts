@@ -19,6 +19,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展集群配置文件目录
+EXPAND_CONF_DIR=${BIN_DIR}/conf
 ## 日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记
@@ -35,8 +37,8 @@ HBASE_HOSTNAME_LISTS=${HBASE_HMASTER}";"${HBASE_HREGIONSERVER}
 HBASE_HOSTNAME_ARRY=(${HBASE_HOSTNAME_LISTS//;/ })
 
 ## 集群扩展的节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 ## 安装目录
 HBASE_INSTALL_HOME=${INSTALL_HOME}/HBase
@@ -138,7 +140,7 @@ function xync_hbase()
     echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
     echo "文件分发中，please waiting....."  | tee -a $LOG_FILE
-    for hostname in ${EXPEND_NODE_ARRY[@]};do
+    for hostname in ${EXPAND_NODE_ARRY[@]};do
         ssh $hostname "mkdir   -p ${HBASE_INSTALL_HOME}"
         rsync -rvl ${HBASE_HOME} root@${hostname}:${HBASE_INSTALL_HOME}  > /dev/null
         ssh $hostname "chmod -R 755 ${HBASE_HOME}"

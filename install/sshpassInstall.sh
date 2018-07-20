@@ -38,6 +38,13 @@ echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 rpm -ivh ${SSHPASS_RPM_DIR}/sshpass-1.06-1.el6.x86_64.rpm
 
 which sshpass
+if [[ $? -eq 0 ]];then
+ echo "sshpass 安装成功"
+else
+ echo "sshpass 安装失败"
+ exit 1
+fi
+
 
 set +x
 

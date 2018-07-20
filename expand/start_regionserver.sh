@@ -26,12 +26,12 @@ LOG_FILE=${LOG_DIR}/hbaseStart.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ## 集群扩展节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 echo -e "启动HBase集群 \n"
 
-for node in ${EXPEND_NODE_ARRY[@]}
+for node in ${EXPAND_NODE_ARRY[@]}
 do
     ssh root@node "sh ${INSTALL_HOME}/HBase/hbase/bin/hbase-daemon.sh start regionserver"
 	if [ $? -eq 0 ];then

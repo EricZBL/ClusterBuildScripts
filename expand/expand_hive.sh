@@ -20,6 +20,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+##扩展集群配置文件目录
+EXPAND_CONF_DIR=${BIN_DIR}/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
@@ -33,8 +35,8 @@ HIVE_HOSTNAME_LISTS=$(grep Meta_ThriftServer ${CONF_DIR}/cluster_conf.properties
 HIVE_HOSTNAME_ARRY=(${HIVE_HOSTNAME_LISTS//;/ })
 HOST1=${HIVE_HOSTNAME_ARRY[0]}
 ## 集群扩展的节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 # HIVE_INSTALL_HOME hive 安装目录
 HIVE_INSTALL_HOME=${INSTALL_HOME}/Hive
@@ -66,7 +68,7 @@ function sync_hive()
 echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
     echo "hive 配置文件分发中，please waiting......"    | tee -a $LOG_FILE
-for hostname in ${EXPEND_NODE_ARRY[@]}
+for hostname in ${EXPAND_NODE_ARRY[@]}
 do
     ssh root@${hostname}  "mkdir -p ${HIVE_INSTALL_HOME}"
     rsync -rvl ${HIVE_HOME}   root@${hostname}:${HIVE_INSTALL_HOME}  >/dev/null
@@ -87,17 +89,22 @@ function config_conf ()
     ## jdbc:hive2://hostnameportlist/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2
     ##
     ####################################################################
-    tmp=""
-    for hostname in ${EXPEND_NODE_ARRY[@]}
-    do
-    	tmp="$tmp"${hostname}":2181,"  # 拼接字符串
-    done
-    tmp=${tmp%?}
+   tmp=""
     for insName in ${HIVE_HOSTNAME_ARRY[@]}
     do
-         old_tmp=$(grep beeline ${HIVE_HOME}/bin/beeline | cut -d ' ' -f6|cut -d '/' -f3)
-         ssh root@$insName "sed -i 's#${old_tmp}#${tmp}#g'  ${HIVE_HOME}/bin/beeline"
+     echo "修改${insName}上的beeline"
+          for hostname in ${EXPAND_NODE_ARRY[@]}
+          do
+             old_tmp=`ssh root@${insName} "grep beeline ${HIVE_HOME}/bin/beeline | cut -d ' ' -f6|cut -d '/' -f3"`
+             tmp=(${hostname}:2181)
+             if [[ ${old_tmp} =~ ${tmp} ]];then
+               echo "${insName}上的beeline中已存在${tmp}"
+             else
+               ssh root@$insName "sed -i 's#${old_tmp}#${old_tmp}\,${tmp}#g'  ${HIVE_HOME}/bin/beeline"
+             fi
+         done
     done
+
 
     ## 配置zookeeper、hive matestore集群地址
     hazk=""
@@ -175,5 +182,7 @@ function main()
     config_conf
     writeUI_file
 }
+
+main
 
 set +x

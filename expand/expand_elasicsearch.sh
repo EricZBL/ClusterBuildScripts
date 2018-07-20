@@ -24,6 +24,8 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录：conf
 CONF_DIR=${ROOT_HOME}/conf
+##扩展集群配置文件目录
+EXPAND_CONF_DIR=${BIN_DIR}/conf
 ## 日记目录：logs
 LOG_DIR=${ROOT_HOME}/logs
 ## elastic 安装日记
@@ -39,8 +41,8 @@ ELASTIC_HOME=${ELASTIC_INSTALL_HOME}/elastic
 ## JAVA_HOME
 JAVA_HOME=${INSTALL_HOME}/JDK/jdk
 ## 集群扩展的节点
-EXPEND_NODE=$(grep Node_HostName ${EXPEND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-EXPEND_NODE_ARRY=(${EXPEND_NODE//;/ })
+EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
+EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 
 ## 获取es的安装节点，放入数组中
 ES_HOSTNAME_LISTS=$(grep ES_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
@@ -99,13 +101,13 @@ function rsync_file(){
 	echo ""  | tee -a $LOG_FILE
 	echo "**********************************************" | tee -a $LOG_FILE
 	echo "please waitinng, 安装文件夹分发中........"  | tee -a $LOG_FILE
-	for hostname in ${EXPEND_NODE_ARRY[@]};do
+	for hostname in ${EXPAND_NODE_ARRY[@]};do
 		ssh root@${hostname}  "mkdir -p ${ELASTIC_INSTALL_HOME}"
 		rsync -rvl ${ELASTIC_SOURCE_DIR}/elastic   root@${hostname}:${ELASTIC_INSTALL_HOME}  >/dev/null
 		ssh root@${hostname}  "chmod -R 755   ${ELASTIC_INSTALL_HOME}"  ## 修改拷过去的文件夹权限为可执行
 	done
 
-	for hostname in ${EXPEND_NODE_ARRY[@]};do
+	for hostname in ${ES_HOSTNAME_ARRY[@]};do
 		rsync -rvl ${ELASTIC_INSTALL_HOME}/elastic/config/elasticsearch.yml   root@${hostname}:${ELASTIC_INSTALL_HOME}/elastic/config/  >/dev/null
 		ssh root@${hostname}  "chmod -R 755   ${ELASTIC_INSTALL_HOME}"  ## 修改拷过去的文件夹权限为可执行
 	done
@@ -166,7 +168,7 @@ function move_file()
 	echo "移动etc_security_limits.d_90-nproc.conf 到 目录/etc/security/limits.d/90-nproc.conf下......"    | tee -a $LOG_FILE
 	echo "移动etc_sysctl.conf 到 目录/etc/sysctl.conf下......"    | tee -a $LOG_FILE
 	echo "" | tee -a $LOG_FILE
-	for hostname in ${EXPEND_NODE_ARRY[@]};do
+	for hostname in ${EXPAND_NODE_ARRY[@]};do
 		ssh root@${hostname} "cp -f ${ELASTIC_HOME}/config/etc_security_limits.conf   /etc/security/limits.conf"
 		ssh root@${hostname} "cp -f ${ELASTIC_HOME}/config/etc_security_limits.d_90-nproc.conf   /etc/security/limits.d/90-nproc.conf"
 		ssh root@${hostname} "cp -f ${ELASTIC_HOME}/config/etc_sysctl.conf   /etc/sysctl.conf"
