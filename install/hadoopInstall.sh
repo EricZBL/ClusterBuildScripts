@@ -78,7 +78,7 @@ function compression_the_tar()
 #       echo "解压hadoop jar 包失败，请检查包是否完整。" | tee -a $LOG_FILE  
 #    fi
     rm -rf ${HADOOP_HOME}
-    cp -r hadoop ${HADOOP_INSTALL_HOME}
+    cp -r hadoop  ${HADOOP_INSTALL_HOME}
     cd -  
 }
 

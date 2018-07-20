@@ -38,7 +38,7 @@ echo -e '启动Hadoop'
 
 for node in ${EXPAND_NODE_ARRY[@]}
 do
-    ssh root@node "sh ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start datanode"
+    ssh root@$node "sh ${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start datanode"
 	if [ $? -eq 0 ];then
 	    echo -e 'hdfs success \n'
 	else
@@ -50,4 +50,5 @@ done
 echo -e "********************验证Datanode是否启动成功*********************"
 sleep 3s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-xcall jps | grep -E 'DataNode|jps show as bellow'
+#xcall jps | grep -E 'DataNode|jps show as bellow'
+xcall jps | grep -E "DataNode|jps"

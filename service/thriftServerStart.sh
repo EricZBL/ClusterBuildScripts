@@ -48,10 +48,10 @@ if [[ $# != 5 && $# != 0 ]]; then
 	exit 1; 
 fi
 
-DRIVER_MEN=${1:-"8g"}
-EXECUTOR_MEN=${2:-"4g"}
-DRIVER_CORES=${3:-"4"}
-EXECUTOR_CORES=${4:-"4"}
+DRIVER_MEN=${1:-"2g"} 
+EXECUTOR_MEN=${2:-"2g"} 
+DRIVER_CORES=${3:-"1"} 
+EXECUTOR_CORES=${4:-"1"} 
 DEFAULT_EXECUTORS=$(echo "(${Tatal_CORES}-${DRIVER_CORES})/${EXECUTOR_CORES}" | bc)
 NUM_EXCUTORS=${5:-$DEFAULT_EXECUTORS}
 

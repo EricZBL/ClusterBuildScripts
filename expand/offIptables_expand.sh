@@ -45,7 +45,7 @@ echo ""  | tee  -a  $LOG_FILE
 echo ""  | tee  -a  $LOG_FILE
 echo "===================================================" | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee -a $LOG_FILE
-for name in ${CLUSTER_HOSTNAME_ARRY[@]}
+for name in ${HOSTNAMES[@]}
 do
     echo ""  | tee  -a  $LOG_FILE
     echo "**************************************************" | tee -a $LOG_FILE
@@ -56,3 +56,22 @@ do
     echo "关闭防火 $name 的防火墙成功。" | tee -a $LOG_FILE
 done
 }
+#####################################################################
+# 函数名: main
+# 描述: 脚本主要业务入口
+# 参数: N/A
+# 返回值: N/A
+# 其他: N/A
+#####################################################################
+function main ()
+{
+offIptables_extended
+}
+
+#---------------------------------------------------------------------#
+#                              执行流程                                #
+#---------------------------------------------------------------------#
+## 打印时间
+echo "" | tee -a $LOG_FILE
+echo "$(date "+%Y-%m-%d  %H:%M:%S")" | tee  -a  $LOG_FILE
+main

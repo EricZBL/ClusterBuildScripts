@@ -32,9 +32,11 @@ sh sshSilentLogin.sh
 
 ## 分发host
 sh ${ROOT_HOME}/tool/xsync /etc/hosts
-
 ## 删除环境变量
 sh delete_env_variable_expand.sh
 
 ## 关闭防火墙
 sh offIptables_expand.sh
+
+## 安装JDK
+sh expand_jdk.sh

@@ -33,8 +33,13 @@ INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '
 ## hbase的安装节点，需要拼接，放入数组HBASE_HOSTNAME_ARRY中
 HBASE_HMASTER=$(grep HBase_Hmaster ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 HBASE_HREGIONSERVER=$(grep HBase_HRegionServer ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-HBASE_HOSTNAME_LISTS=${HBASE_HMASTER}";"${HBASE_HREGIONSERVER}
-HBASE_HOSTNAME_ARRY=(${HBASE_HOSTNAME_LISTS//;/ })
+
+if [[ ${HBASE_HREGIONSERVER} =~ ${HBASE_HMASTER} ]]; then
+    HBASE_HOSTNAME_ARRY=(${HBASE_HREGIONSERVER//;/ })
+else
+    HBASE_HOSTNAME_LISTS=${HBASE_HMASTER}";"${HBASE_HREGIONSERVER}
+    HBASE_HOSTNAME_ARRY=(${HBASE_HOSTNAME_LISTS//;/ })
+fi
 
 ## 集群扩展的节点
 EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
@@ -98,8 +103,6 @@ function config_conf_slaves()
     cd ${HBASE_HOME}/conf
     mkdir -p ${HBASE_TMP_DIR}
     mkdir -p ${HBASE_ZK_DATADIR}
-    for data_host in ${HBASE_HOSTNAME_ARRY[@]}
-    do
         NUM=$[`grep -n hbase.zookeeper.quorum hbase-site.xml | cut -d ':' -f1`+1]
         sed -i "${NUM}c ${VALUE}${ZK_LISTS}${VALUE_END}" hbase-site.xml
         echo  "配置Hbase-site.xml done ......"  | tee -a $LOG_FILE
@@ -113,7 +116,6 @@ function config_conf_slaves()
         else
             echo "hadoop 没有安装正确，请检查hadoop 的安装配置。"  | tee  -a  $LOG_FILE
         fi
-    done
 }
 
 function writeUI_file(){
@@ -143,6 +145,10 @@ function xync_hbase()
     for hostname in ${EXPAND_NODE_ARRY[@]};do
         ssh $hostname "mkdir   -p ${HBASE_INSTALL_HOME}"
         rsync -rvl ${HBASE_HOME} root@${hostname}:${HBASE_INSTALL_HOME}  > /dev/null
+        ssh $hostname "chmod -R 755 ${HBASE_HOME}"
+    done
+    for hostname in ${HBASE_HOSTNAME_ARRY[@]};do
+         scp  ${HBASE_INSTALL_HOME}/hbase/conf/hbase-site.xml  root@${hostname}:${HBASE_INSTALL_HOME}/hbase/conf
         ssh $hostname "chmod -R 755 ${HBASE_HOME}"
     done
     echo "hbase 文件分发完成，安装完成......"  | tee  -a  $LOG_FILE

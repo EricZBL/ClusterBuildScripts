@@ -79,12 +79,10 @@ function delete_namesrv_variable
 	echo "**********************************************" | tee -a $LOG_FILE
 	echo "please waitinng, 删除namesrv环境变量........"  | tee -a $LOG_FILE
 	## 拼接安装了Rocketmq的节点IP
-	NameServer_Host=$(grep RocketMQ_Namesrv ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
-	Broker_Hosts=$(grep RocketMQ_Broker ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
+	Broker_Hosts=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 	Broker_Hostarr=(${Broker_Hosts//;/ })
-	Host_Arr=(${Broker_Hostarr[*]} ${NameServer_Host})
 
-	for insName in ${Host_Arr[@]}
+	for insName in ${Broker_Hostarr[@]}
 	do
 		# 判断是否存在export NAMESRV_ADDR=172.18.18.108:9876这一行，若存在删除
 		namesrv_exists=$(ssh root@${insName} 'grep "export NAMESRV_ADDR=" /etc/profile')
@@ -108,9 +106,9 @@ function delete_openblas_num_variable
 	echo "**********************************************" | tee -a $LOG_FILE
 	echo "please waitinng, 删除openblas_num环境变量........"  | tee -a $LOG_FILE
 	## 获取配置算法节点IP
-	GsFaceLib_Host=$(grep GsFaceLib_HostName ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
+	GsFaceLib_Host=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 	gsFaceLib_arr=(${GsFaceLib_Host//;/ })
-	for gsFaceLib_host in ${gsFaceLib_arr[@]}
+	for gsFaceLib_host in ${HOSTNAMES[@]}
 	do
 		# 判断是否存在export OPENBLAS_NUM_THREADS=1这一行，若存在删除
 		openblas_num_exists=$(ssh root@${gsFaceLib_host} 'grep "export OPENBLAS_NUM_THREADS=" /etc/profile')
@@ -135,7 +133,7 @@ function delete_gsfacelib_variable
 	echo "**********************************************" | tee -a $LOG_FILE
 	echo "please waitinng, 删除gsfacelib环境变量........"  | tee -a $LOG_FILE
 	# 从配置文件中获取gsfacelib算法安装节点
-	GSFACELIB_HOST=$(grep GsFaceLib_HostName ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
+	GSFACELIB_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 	gsfacelibhost_arr=(${GSFACELIB_HOST//;/ })
 	for gsfacelib_host in ${gsfacelibhost_arr[@]}
 	do

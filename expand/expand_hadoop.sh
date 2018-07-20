@@ -86,10 +86,10 @@ function config_conf_slaves()
     echo ""  >  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/slaves
     for data_host in ${HADOOP_IP_ARRY[@]}
     do
-        NUM=$[`grep -n ha.zookeeper.quorum ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/core-xite.xml | cut -d ':' -f1`+1]
-        sed -i "${NUM}c ${VALUE}${ZK_LISTS}${VALUE_END}" ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/core-xite.xml
-        NUM=$[`grep -n yarn.resourcemanager.zk-address ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/yarn-xite.xml | cut -d ':' -f1`+1]
-        sed -i "${NUM}c ${VALUE}${ZK_LISTS}${VALUE_END}" ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/yarn-xite.xml
+        NUM=$[`grep -n ha.zookeeper.quorum ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/core-site.xml | cut -d ':' -f1`+1]
+        sed -i "${NUM}c ${VALUE}${ZK_LISTS}${VALUE_END}" ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/core-site.xml
+        NUM=$[`grep -n yarn.resourcemanager.zk-address ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/yarn-site.xml | cut -d ':' -f1`+1]
+        sed -i "${NUM}c ${VALUE}${ZK_LISTS}${VALUE_END}" ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/yarn-site.xml
         echo ${data_host} >> ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/slaves
     done
 }
@@ -113,6 +113,12 @@ function xync_hadoop()
     do
         ssh root@$host_name  "rm -rf ${HADOOP_HOME}"
         rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop  root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
+        ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
+    done
+    for host_name in ${host_arr[@]}
+    do
+        scp  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/core-site.xml  root@${host_name}:${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/
+        scp  ${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/yarn-site.xml  root@${host_name}:${HADOOP_INSTALL_HOME}/hadoop/etc/hadoop/
         ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
     done
     #rm -rf  ${HADOOP_SOURCE_DIR}/hadoop

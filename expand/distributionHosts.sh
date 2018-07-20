@@ -24,59 +24,27 @@ CONF_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/expand/conf
 LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 ## hosts 文件
 HOSTS_FILE=/etc/hosts
-## 集群所有节点主机名，放入数组中
+## 原集群节点
+INSTALL_HOME=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
+INSTALL_HOSTNAMES=(${INSTALL_HOME//;/ })
+## 集群新增节点主机名，放入数组中
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
-echo "读取的新增集群节点IP为："${CLUSTER_HOST}
+echo "读取的新增集群节点IP为："${CLUSTER_HOST} | tee -a $LOG_FILE
 HOSTNAMES=(${CLUSTER_HOST//;/ })
-## 原cluster配置文件
-CLUSTER_HOST=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/* | cut -d '=' -f2)
-ORIGINAL_HOSTNAMES=(${CLUSTER_HOST//;/ })
-
-#####################################################################
-# 函数名: amend_hosts
-# 描述: 修改hosts文件
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function amend_hosts ()
-{
-for host in ${HOSTNAMES[@]};
-do
-    echo "---------------------------------------------------------"
-    echo "正在对${host}进行操作"
-    grep ${host} ${HOSTS_FILE}
-    if [[ $? -eq 0 ]]; then
-    num1=$[ $(cat /etc/hosts | cat -n | grep ${host} | awk '{print $1}') ]
-    IP_CONFIG=`sed -n "${num1}p" ${HOSTS_FILE}`
-    fi
-    ## 读原配置文件
-    sshpass -p 123456 ssh -o StrictHostKeyChecking=no root@${ORIGINAL_HOSTNAMES} "echo ${IP_CONFIG} >> ${HOSTS_FILE}"
-done
-}
-
-#####################################################################
-# 函数名: distribution_hosts
-# 描述: hosts 配置文件分发
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
 function distribution_hosts ()
 {
-shpass -p 123456 ssh -o StrictHostKeyChecking=no root@${ORIGINAL_HOSTNAMES} "echo $yinhang >> /etc/hosts"
-cd /etc
-for host in ${ORIGINAL_HOSTNAMES[@]};do
-    echo "**********************************************"
-    echo "${host} 配置文件分发中，please waiting......"
-    scp ${HOSTS_FILE} ${host}:${HOSTS_FILE}
-    echo "${host} 配置文件分发完成！"
+for host in ${INSTALL_HOSTNAMES[@]};
+do
+scp ${HOSTS_FILE} root@${host}:${HOSTS_FILE}
+done
+for host in ${HOSTNAMES[@]};
+do
+scp ${HOSTS_FILE} root@${host}:${HOSTS_FILE}
 done
 }
 
 function main ()
 {
-amend_hosts
 distribution_hosts
 }
 main

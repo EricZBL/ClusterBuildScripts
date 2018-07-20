@@ -71,12 +71,18 @@ do
     echo "拷贝安装包到${insName}临时安装目录"  | tee -a $LOG_FILE
     cp -R ${ZOOKEEPER_SOURCE_DIR}/zookeeper ${ZOOKEEPER_SOURCE_DIR}/$insName
     let i++
-    echo "server.${i}=${insName}:2888:3888" >> ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg
+    
+    value1=$(grep "server.${i}" ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg)
+    if [ -n "${value1}" ];then
+	sed -i "s#server.${i}=.*#server.${i}=${insName}:2888:3888#g"  ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg
+    else 
+        echo "server.${i}=${insName}:2888:3888" >> ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg
+    fi
+
     echo "$i" > ${ZOOKEEPER_SOURCE_DIR}/$insName/zookeeper/data/myid
     echo "修改 ${insName} 的zookeeper logs目录 "  | tee -a $LOG_FILE
     sed -i "s;zookeeper_logs\/logs;\/opt\/hzgc\/logs\/zookeeper;g"  ${ZOOKEEPER_SOURCE_DIR}/$insName/zookeeper/bin/zkEnv.sh
 done
-
 echo "" | tee -a  $LOG_FILE
 ## 分发zoo.cfg，分布式所需要的zoo.cfg
 for insName in ${ZK_HOSTNAME_ARRY[@]}
@@ -104,7 +110,6 @@ do
         echo "rsync zookeeper to the ${ZOOKEEPER_INSTALL_HOME} failed !!!"  | tee -a $LOG_FILE
     fi
 done
-
 echo "" | tee -a  $LOG_FILE
 ## 删除临时目录
 for insName in ${ZK_HOSTNAME_ARRY[@]}

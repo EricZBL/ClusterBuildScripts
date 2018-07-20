@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    installEnv.sh
+## Filename:    installAll.sh
 ## Description: 安装环境的脚本.
 ## Version:     2.0
 ## Author:      zhangbaolin
@@ -33,7 +33,7 @@ sh expectInstall.sh
 sh sshSilentLogin.sh
 
 ## 分发host
-sh ${ROOT_HOME}/tool/xsync /etc/hosts
+sh ../tool/xsync /etc/hosts
 
 ## 删除环境变量
 sh delete_env_variable.sh

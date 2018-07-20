@@ -43,27 +43,32 @@ for rpm_pak in $(cat  mysql.tmp);do
     echo "==================================================="  | tee -a $LOG_FILE
     echo "删除原先系统mysql rpm 软件包: ${rpm_pak}"  |  tee  -a  $LOG_FILE
     rpm -e --nodeps ${rpm_pak}
+    rm -rf /var/lib/mysql/
 done
 rm -rf mysql.tmp
 
 ## 查看对应MySQL目录,如果存在则删除对应目录
-find / -name mysql | grep -v ${ROOT_HOME} > mysql.tmp
-for mysql_dir in $(cat  mysql.tmp);do
-    echo "==================================================="  | tee -a $LOG_FILE
-    echo "删除对应的mysql目录: ${mysql_dir}"  |  tee  -a  $LOG_FILE
-    rm -rf ${mysql_dir}
-done
-rm -rf mysql.tmp
+#find / -name mysql > mysql.tmp
+#for mysql_dir in $(cat  mysql.tmp);do
+#    echo "==================================================="  | tee -a $LOG_FILE
+#    echo "删除对应的mysql目录: ${mysql_dir}"  |  tee  -a  $LOG_FILE
+#    rm -rf ${mysql_dir}
+#done
+#rm -rf mysql.tmp
 
 ## 删除对应my.cnf文件
 MY_CNF="/etc/my.cnf"
+#if [-f "${MY_CNF}"];then
     echo "删除my.cnf文件.................."  |  tee  -a  $LOG_FILE
     rm -rf /etc/my.cnf
+#fi
 
 ## 删除对应mysqld.log文件
 MYSQL_LOG="/var/log/mysqld.log"
+#if [-f "${MY_CNF}"];then
     echo "删除mysqld.log文件................................."  |  tee  -a  $LOG_FILE
     rm -rf /var/log/mysqld.log
+#fi
 
 
 ## 重新安装mysql

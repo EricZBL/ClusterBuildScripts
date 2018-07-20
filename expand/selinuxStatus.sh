@@ -45,5 +45,4 @@ function main
 	fi
 
 }
-
 main

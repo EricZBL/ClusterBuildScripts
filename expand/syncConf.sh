@@ -152,6 +152,19 @@ function main()
         done
     fi
 
+
+    if [[ "$component" = "haproxy" ]] ; then
+        for node in ${EXPAND_NODE_ARRY[@]}; do
+             HAPROXY=$(grep HAproxy_ServiceNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
+             if [[ "$HAPROXY" =~ "$node" ]] ; then
+                 echo "配置文件中已存在此节点:$node"
+		     else
+                 sed -i "s#HAproxy_ServiceNode=$HAPROXY#HAproxy_ServiceNode=$HAPROXY;$node#g" ${ROOT_HOME}/conf/cluster_conf.properties
+                 echo "在主配置文件HAproxy中加入节点:$node"
+             fi
+        done
+    fi
+
 }
 
 main

@@ -26,6 +26,9 @@ LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 LOG_FILE=${LOG_DIR}/expand_kafka.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
+## 原集群节点
+INSTALL=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
+INSTALL_HOSTNAMES=(${INSTALL//;/ })
 ## bigdata 目录
 BIGDATA=/opt/hzgc/bigdata/
 ## KAFKA_INSTALL_HOME kafka 安装目录
@@ -53,15 +56,22 @@ KAFKA_HOSTNAME_ARRY=(${KAFKA_HOSTNAME_LISTS//;/ })
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 echo "读取的新增集群节点IP为："${CLUSTER_HOST} | tee -a $LOG_FILE
 HOSTNAMES=(${CLUSTER_HOST//;/ })
+## 原集群节点和新增节点
+Host_Arr=${INSTALL}";"${CLUSTER_HOST}
+Host_Arrs=(${Host_Arr//;/ })
 ## server.properties文件节点名称
 SERVER_HOSTS=$(grep zookeeper.connect= ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2)
 SERVER_HOSTNAMES=(${SERVER_HOSTS//;/ })
 ## producer.properties文件节点名称
-PRODUCER_HOSTS=$(grep bootstrap.servers ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2)
+PRODUCER_HOSTS=$(grep bootstrap.servers ${KAFKA_PRODUCER_PROPERTIES} | cut -d '=' -f2)
 PRODUCER_HOSTNAMES=(${PRODUCER_HOSTS//;/ })
 ## application.conf文件
 APPLICATION_HOSTS=$(grep kafka-manager.zkhosts=\" ${KAFKA_APPLICATION_CONF} | cut -d '=' -f2 | cut -d '"' -f2)
-APPLICATION_HOSTNAMES=(${PRODUCER_HOSTS//;/ })
+APPLICATION_HOSTNAMES=(${APPLICATION_HOSTS//;/ })
+
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo "准备进行 kafka 扩展安装操作 zzZ~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE
 
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
@@ -82,7 +92,7 @@ function zookeeper_connect ()
 for insName in ${HOSTNAMES[@]}
 do
     if [[ "${SERVER_HOSTS}" =~ "$insName" ]] ; then
-        echo $insName "新增节点已添加，不需要重复操作！！！" | tee -a $LOG_FILE
+        echo "zookeeper.connect 配置文件中已添加新增节点 $insName 的IP以及端口，不需要重复添加！！！" | tee -a $LOG_FILE
     else
         VALUE=$(grep zookeeper.connect= ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2)
         sed -i "s#zookeeper.connect=${VALUE}#zookeeper.connect=${VALUE},${insName}:2181#g" ${KAFKA_SERVER_PROPERTIES}
@@ -100,12 +110,17 @@ function producer_properties ()
 {
 for insName in ${HOSTNAMES[@]}
 do
-    if [[ "${PRODUCER_HOSTNAMES}" =~ "$insName" ]] ; then
-        echo $insName "新增节点已添加，不需要重复操作！！！" | tee -a $LOG_FILE
+    if [[ "${PRODUCER_HOSTS}" =~ "${insName}" ]] ; then
+        echo "bootstrap.servers配置文件中已添加新增节点 $insName 的IP以及端口，不需要重复操作！！！" | tee -a $LOG_FILE
     else
         value=$(grep bootstrap.servers ${KAFKA_PRODUCER_PROPERTIES} | cut -d '=' -f2)
         sed -i "s#bootstrap.servers=${value}#bootstrap.servers=${value},${insName}:9092#g" ${KAFKA_PRODUCER_PROPERTIES}
     fi
+done
+## 拷贝到原节点
+for host in ${INSTALL_HOSTNAMES[@]};
+do
+scp ${KAFKA_PRODUCER_PROPERTIES} root@${host}:${KAFKA_PRODUCER_PROPERTIES}
 done
 }
 
@@ -120,13 +135,18 @@ function application_conf ()
 {
 for insName in ${HOSTNAMES[@]}
 do
-echo $insName "------------------------"
     if [[ "${APPLICATION_HOSTS}" =~ "$insName" ]] ; then
         echo $insName "新增节点已添加，不需要重复操作！！！" | tee -a $LOG_FILE
     else
         value=$(grep kafka-manager.zkhosts=\" ${KAFKA_APPLICATION_CONF} | cut -d '=' -f2 | cut -d '"' -f2)
         sed -i "s#kafka-manager.zkhosts=\"${value}\"#kafka-manager.zkhosts=\"${value},${insName}:2181\"#g" ${KAFKA_APPLICATION_CONF}
     fi
+done
+
+## 拷贝到原节点
+for host in ${INSTALL_HOSTNAMES[@]};
+do
+scp ${KAFKA_APPLICATION_CONF} root@${host}:${KAFKA_APPLICATION_CONF}
 done
 }
 
@@ -163,25 +183,18 @@ LOG_DIRS=/opt/hzgc/logs/kafka/kafka-logs
 function server_properties ()
 {
 num=1
-for insName in ${KAFKA_HOSTNAME_ARRY[@]}
+for insName in ${Host_Arrs[@]}
 do
     ##修改 brokerID
     echo "正在修改${insName}的 broker.id ..." | tee -a $LOG_FILE
     value1=`ssh root@${insName} "grep 'broker.id' ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2"`
-    ssh root@${insName} "sed -i 's#broker.id=${value1}#broker.id=${num}#g' ${KAFKA_SERVER_PROPERTIES}"
+    ssh root@${insName} "sed -i 's#broker.id=.*#broker.id=${num}#g' ${KAFKA_SERVER_PROPERTIES}"
     echo "${insName}的 broker.id 配置修改完毕！！！" | tee -a $LOG_FILE
-
    num=$(($num+1))
 done
-
+echo "##########################"
 for insName in ${HOSTNAMES[@]}
 do
-    ##修改 brokerID
-    echo "正在修改${insName}的 broker.id ..." | tee -a $LOG_FILE
-    value1=`ssh root@${insName} "grep 'broker.id' ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2"`
-    ssh root@${insName} "sed -i 's#broker.id=${value1}#broker.id=${num}#g' ${KAFKA_SERVER_PROPERTIES}"
-    echo "${insName}的 broker.id 配置修改完毕！！！" | tee -a $LOG_FILE
-
     ##修改 listeners
     echo "正在修改${insName}的 listeners ..." | tee -a $LOG_FILE
     value2=`ssh root@${insName} "grep 'listeners=PLAINTEXT' ${KAFKA_SERVER_PROPERTIES} | cut -d ':' -f2| sed -n '1p;1q'"`
@@ -207,6 +220,7 @@ function main ()
 {
 zookeeper_connect
 producer_properties
+application_conf
 kafka_distribution
 server_properties
 }
@@ -218,4 +232,6 @@ server_properties
 echo "" | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")" | tee  -a  $LOG_FILE
 main
-
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo "kafka 扩展安装完成 zzZ~ " | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE

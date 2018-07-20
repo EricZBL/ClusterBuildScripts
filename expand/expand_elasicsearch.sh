@@ -47,7 +47,6 @@ EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 ## 获取es的安装节点，放入数组中
 ES_HOSTNAME_LISTS=$(grep ES_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ES_HOSTNAME_ARRY=(${ES_HOSTNAME_LISTS//;/ })
-echo ${ES_HOSTNAME_ARRY}
 
 ## 创建ELASTIC的安装目录
 mkdir -p ${ELASTIC_HOME}
@@ -190,8 +189,8 @@ function move_file()
 function main()
 {
     config_yml_hostnamelist
-	rsync_file
-	config_yml_hostandIP
+    rsync_file
+    config_yml_hostandIP
     move_file
 }
 

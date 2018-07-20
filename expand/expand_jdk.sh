@@ -1,14 +1,13 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    mysqlInstall.sh
-## Description: 安装并启动mysql。
+## Filename:    expand_jdk.sh
+## Description: 新增节点jdk的安装
 ##              实现自动化的脚本
 ## Version:     2.0
-## Author:      zhangbaolin
-## Created:     2018-06-29 
+## Author:      yinhang
+## Created:     2018-07-20
 ################################################################################
-
 #set -x
 
 cd `dirname $0`
@@ -17,6 +16,7 @@ BIN_DIR=`pwd`
 cd ..
 ## 安装包根目录
 ROOT_HOME=`pwd`
+echo ${ROOT_HOME}
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 ## 日记目录
@@ -27,34 +27,25 @@ LOG_FILE=${LOG_DIR}/jdkInstall.log
 JDK_SOURCE_DIR=${ROOT_HOME}/component/bigdata
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+## 集群新增节点主机名，放入数组中
+CLUSTER_HOST=$(grep Node_HostName ${ROOT_HOME}/expand/conf/expand_conf.properties | cut -d '=' -f2)
+echo "读取的新增集群节点IP为："${CLUSTER_HOST} | tee -a $LOG_FILE
+HOSTNAMES=(${CLUSTER_HOST//;/ })
 ## JAVA_INSTALL_HOME jdk 安装目录
 JAVA_INSTALL_HOME=${INSTALL_HOME}/JDK
 ## JAVA_HOME  jdk 根目录
 JAVA_HOME=${INSTALL_HOME}/JDK/jdk
 
 mkdir -p ${JAVA_INSTALL_HOME}
-mkdir -p ${LOG_DIR} 
-
+mkdir -p ${LOG_DIR}
 
 echo ""  | tee  -a  $LOG_FILE
 echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"   | tee -a $LOG_FILE
 
-#echo “解压jdk tar 包中，请稍候.......”  | tee -a $LOG_FILE
-#tar -xf ${JDK_SOURCE_DIR}/jdk.tar.gz -C $JDK_SOURCE_DIR
-#if [ $? == 0 ];then
-#    echo "解压缩jdk 安装包成功......"  | tee -a $LOG_FILE 
-#else 
-#    echo “解压jdk 安装包失败。请检查安装包是否损坏，或者重新安装.”  | tee -a $LOG_FILE
-#    exit 1
-#fi
-
-
 ## 获取JDK分发节点
-CLUSTER_HOST=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-jdkhost_arr=(${CLUSTER_HOST//;/ })    
-for jdk_host in ${jdkhost_arr[@]}
+for jdk_host in ${HOSTNAMES[@]}
 do
     echo ""  | tee  -a  $LOG_FILE
     echo "************************************************"
@@ -66,7 +57,7 @@ do
         for rpm_pak in $(cat  java.tmp);do
             echo "删除原先系统java rpm 软件包: ${rpm_pak}"  |  tee  -a  $LOG_FILE;
             rpm -e --nodeps ${rpm_pak};
-        done; 
+        done;
         rm -rf /home/test'
 
     echo "jdk 分发中,请稍候......"  | tee -a $LOG_FILE
@@ -88,8 +79,8 @@ do
     if [ "${javahome_exists}" = "" ] && [ "${javapath_exists}" = "" ]; then
         ssh root@${jdk_host} "echo '#JAVA_HOME'>>/etc/profile ;echo export JAVA_HOME=$JAVA_HOME >> /etc/profile"
         ssh root@${jdk_host} 'echo export PATH=\$JAVA_HOME/bin:\$PATH  >> /etc/profile; echo "">> /etc/profile'
-    fi	
+    fi
     ssh root@${jdk_host} "source /etc/profile"
 done
 
-set +x	
+set +x

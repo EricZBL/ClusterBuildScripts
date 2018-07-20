@@ -89,22 +89,23 @@ function config_conf ()
     ## jdbc:hive2://hostnameportlist/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2
     ##
     ####################################################################
-   tmp=""
+    tmp=""
     for insName in ${HIVE_HOSTNAME_ARRY[@]}
     do
-     echo "修改${insName}上的beeline"
+        echo "修改${insName}上的beeline"
+
           for hostname in ${EXPAND_NODE_ARRY[@]}
           do
-             old_tmp=`ssh root@${insName} "grep beeline ${HIVE_HOME}/bin/beeline | cut -d ' ' -f6|cut -d '/' -f3"`
+             old_tmp=`ssh root@$insName "grep beeline ${HIVE_HOME}/bin/beeline | cut -d ' ' -f6|cut -d '/' -f3"`
+             echo $old_tmp
              tmp=(${hostname}:2181)
              if [[ ${old_tmp} =~ ${tmp} ]];then
-               echo "${insName}上的beeline中已存在${tmp}"
+               echo "${insName}  beeline中已存在${tmp}"
              else
                ssh root@$insName "sed -i 's#${old_tmp}#${old_tmp}\,${tmp}#g'  ${HIVE_HOME}/bin/beeline"
              fi
          done
     done
-
 
     ## 配置zookeeper、hive matestore集群地址
     hazk=""
@@ -120,10 +121,10 @@ function config_conf ()
         echo ""  | tee  -a  $LOG_FILE
         echo "==================================================="  | tee -a $LOG_FILE
         echo "修改hiveserver2 WEBUI地址 in {$insName}目录...... "  | tee -a $LOG_FILE
-        NUM=$[`grep -n hive.zookeeper.quorum ${HIVE_HOME}/conf/hive-site.xml | cut -d " " -f1`+1]
+        NUM=$[`grep -n hive.zookeeper.quorum ${HIVE_HOME}/conf/hive-site.xml | cut -d " " -f1| cut -d ':' -f1`+1]
         ssh root@$insName "sed -i '${NUM}c ${VALUE}${hazk%?}${VALUE_END}'  ${HIVE_HOME}/conf/hive-site.xml"
-        NUM=$[`grep -n hive.metastore.uris ${HIVE_HOME}/conf/hive-site.xml | cut -d " " -f1`+1]
-        ssh root@insName "sed -i '${NUM}c ${VALUE}${hith%?}${VALUE_END}'  ${HIVE_HOME}/conf/hive-site.xml"
+        NUM=$[`grep -n hive.metastore.uris ${HIVE_HOME}/conf/hive-site.xml | cut -d " " -f1| cut -d ':' -f1`+1]
+        ssh root@$insName "sed -i '${NUM}c ${VALUE}${hith%?}${VALUE_END}'  ${HIVE_HOME}/conf/hive-site.xml"
     done
 
 
@@ -146,7 +147,7 @@ function config_conf ()
         echo ""  | tee  -a  $LOG_FILE
         echo ""  | tee  -a  $LOG_FILE
         echo "==================================================="  | tee -a $LOG_FILE
-        echo "修改hiveserver2 thrift 地址 in {$insName}目录...... "  | tee -a $LOG_FILE
+        echo "修改hiveserver2 thrift 地址 in ${insName}目录...... "  | tee -a $LOG_FILE
         NUM=$[`grep -n hive.server2.thrift.bind.host ${HIVE_HOME}/conf/hive-site.xml| cut -d ':' -f1`+1]
         ssh root@$insName "sed -i '${NUM}c ${VALUE}${insName}${VALUE_END}' ${HIVE_HOME}/conf/hive-site.xml"
     done
@@ -182,7 +183,5 @@ function main()
     config_conf
     writeUI_file
 }
-
 main
-
 set +x

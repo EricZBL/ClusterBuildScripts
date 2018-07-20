@@ -26,10 +26,16 @@ LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 LOG_FILE=${LOG_DIR}/expand_zookeeper.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
+## 原集群节点
+INSTALL=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
+INSTALL_HOSTNAMES=(${INSTALL//;/ })
 ## 集群新增节点主机名，放入数组中
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 echo "读取的新增集群节点IP为："${CLUSTER_HOST} | tee -a $LOG_FILE
 HOSTNAMES=(${CLUSTER_HOST//;/ })
+## 原集群节点和新增节点
+Host_Arr=${INSTALL}";"${CLUSTER_HOST}
+Host_Arrs=(${Host_Arr//;/ })
 
 ## ZOOKEEPER_INSTALL_HOME zookeeper 安装目录
 ZOOKEEPER_INSTALL_HOME=${INSTALL_HOME}/Zookeeper
@@ -44,9 +50,10 @@ ZOO_CFG_FILE=${ZOOKEEPER_CONF}/zoo.cfg
 ZOOKEEPER_DATA=${ZOOKEEPER_HOME}/data
 ## zookeeper myid 文件
 ZOOKEEPER_MYID=${ZOOKEEPER_DATA}/myid
-##
-NUM=$(sed -n '$p' ${ZOO_CFG_FILE} | cut -d '.' -f2 | cut -d '=' -f1)
-NUMBER=${NUM}+1
+
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 zookeeper 扩展安装操作 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
@@ -57,28 +64,6 @@ echo "" | tee -a $LOG_FILE
 echo "" | tee -a $LOG_FILE
 echo "===================================================" | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"
-
-#####################################################################
-# 函数名:zoo_cfg
-# 描述: 修改 zoo.cfg 和 myid 文件
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function zoo_cfg ()
-{
-for insName in ${HOSTNAMES[@]}
-do
-    value1=$(grep "server.${NUMBER}"  ${ZOO_CFG_FILE})
-    if [ -n "${value1}" ];then
-        sed -i "s#server.${NUMBER}=.*#server.${NUMBER}=${insName}:2888:3888#g"  ${ZOO_CFG_FILE}
-    else
-        echo "server.${NUMBER}=${insName}:2888:3888" >> ${ZOO_CFG_FILE}
-    fi
-
-    NUMBER=$((${NUMBER}+1))
-done
-}
 
 #####################################################################
 # 函数名:zookeeper_distribution
@@ -101,24 +86,60 @@ done
 }
 
 #####################################################################
-# 函数名:myid
-# 描述: 修改 myid 文件
+# 函数名:zoo_cfg
+# 描述: 修改 zoo.cfg
 # 参数: N/A
 # 返回值: N/A
 # 其他: N/A
 #####################################################################
-
-function myid ()
+NUM=$(sed -n '$p' ${ZOO_CFG_FILE} | cut -d '.' -f2 | cut -d '=' -f1)
+NUMBER=$[${NUM}+1]
+function zoo_cfg ()
 {
 for insName in ${HOSTNAMES[@]}
 do
-    ## 修改 myid
-    ssh root@${insName} "echo ${NUMBER} >> ${ZOOKEEPER_MYID}"
+    ## 修改 zoo.cfg
+    value1=$(grep "${insName}"  ${ZOO_CFG_FILE})
+    if [ -n "${value1}" ];then
+        sed -i "s#server.${NUMBER}=.*#server.${NUMBER}=${insName}:2888:3888#g"  ${ZOO_CFG_FILE}
+    else
+        echo "server.${NUMBER}=${insName}:2888:3888" >> ${ZOO_CFG_FILE}
+    fi
 
-    NUMBER=$((${NUMBER}+1))
+    NUMBER=$[${NUMBER}+1]
+done
+## 拷贝到原节点
+for host in ${INSTALL_HOSTNAMES[@]};
+do
+scp ${ZOO_CFG_FILE} root@${host}:${ZOO_CFG_FILE}
+done
+## 拷贝到新增节点
+for host in ${HOSTNAMES[@]};
+do
+scp ${ZOO_CFG_FILE} root@${host}:${ZOO_CFG_FILE}
 done
 }
 
+#####################################################################
+# 函数名:myid
+# 描述: 修改 myid
+# 参数: N/A
+# 返回值: N/A
+# 其他: N/A
+#####################################################################
+function myid ()
+{
+num=1
+for insName in ${Host_Arrs[@]}
+do
+    ##修改 myid
+    echo "正在修改${insName}的 myid ..." | tee -a $LOG_FILE
+    ssh root@${insName} "sed -i 's#.*#${num}#g'  ${ZOOKEEPER_MYID}"
+    echo "${insName}的 myid 配置修改完毕！！！" | tee -a $LOG_FILE
+
+   num=$(($num+1))
+done
+}
 #####################################################################
 # 函数名: main
 # 描述: 脚本主要业务入口
@@ -128,8 +149,8 @@ done
 #####################################################################
 function main ()
 {
-zoo_cfg
 zookeeper_distribution
+zoo_cfg
 myid
 }
 
@@ -140,6 +161,8 @@ myid
 echo "" | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")" | tee  -a  $LOG_FILE
 main
-
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo " zookeeper 扩展安装操作完成 zzZ~ " | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 

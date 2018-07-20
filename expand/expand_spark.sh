@@ -26,6 +26,9 @@ LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 LOG_FILE=${LOG_DIR}/expand_spark.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
+## 原集群节点
+INSTALL=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
+INSTALL_HOSTNAMES=(${INSTALL//;/ })
 ## 集群新增节点主机名，放入数组中
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 echo "读取的新增集群节点IP为："${CLUSTER_HOST} | tee -a $LOG_FILE
@@ -72,13 +75,19 @@ done
 function spark_env ()
 {
 VALUE=$(grep "SPARK_DAEMON_JAVA_OPTS=" ${SPARK_ENV_FILE} | cut -d '=' -f4 | cut -d ' ' -f1)
-sed -i "s#${VALUE}#${VALUE},${zkconf%?}#g" ${SPARK_ENV_FILE}
-for insName in ${SERVICE_HOSTS[@]}
+VALUE2=$(grep "${zkconf%?}" ${SPARK_ENV_FILE})
+if [ -n "${VALUE2}" ];then
+    echo "SPARK_DAEMON_JAVA_OPTS 配置中新增节点IP及端口号已存在，不需要添加"
+else
+    sed -i "s#${VALUE}#${VALUE},${zkconf%?}#g" ${SPARK_ENV_FILE}
+fi
+
+## 拷贝到原节点
+for host in ${INSTALL_HOSTNAMES[@]};
 do
-    ssh ${insName} "sed -i 's#${VALUE1}#${VALUE1},${zkconf%?}#g' ${SPARK_ENV_FILE}"
+    scp ${SPARK_ENV_FILE} root@${host}:${SPARK_ENV_FILE}
 done
 }
-
 #####################################################################
 # 函数名:salves
 # 描述: 修改salves文件
@@ -89,14 +98,20 @@ done
 function salves ()
 {
 ## 将新增节点IP添加到 slaves 文件中
-
 for insName in ${HOSTNAMES[@]}
 do
-    echo ${insName} >> ${SLAVES_FILE}
+    value1=$(grep "${insName}"  ${SLAVES_FILE})
+    if [ -n "${value1}" ];then
+    ## 不为空
+        echo "slaves 文件中已存在新增节点 ${insName} 的IP，不需要添加"
+    else
+        echo ${insName} >> ${SLAVES_FILE}
+    fi
 done
-for insName in ${SERVICE_HOSTS[@]}
+## 拷贝到原节点
+for host in ${INSTALL_HOSTNAMES[@]};
 do
-    scp ${SLAVES_FILE} root@${insName}:${SPARK_CONF_DIR}
+    scp ${SLAVES_FILE} root@${host}:${SLAVES_FILE}
 done
 }
 
@@ -110,13 +125,18 @@ done
 function spark_beeline ()
 {
 VALUE1=$(grep "jdbc:hive2://" ${BEELINE_FILE} | cut -d '/' -f5)
-sed -i "s#${VALUE1}#${VALUE1},${zkconf%?}#g" ${BEELINE_FILE}
-for insName in ${SERVICE_HOSTS[@]}
+VALUE2=$(grep "${zkconf%?}" ${BEELINE_FILE})
+if [ -n "${VALUE2}" ];then
+    echo "spark_beeline 配置中新增节点IP及端口号已存在，不需要添加"
+else
+    sed -i "s#${VALUE1}#${VALUE1},${zkconf%?}#g" ${BEELINE_FILE}
+fi
+## 拷贝到原节点
+for host in ${INSTALL_HOSTNAMES[@]};
 do
-    ssh ${insName} "sed -i 's#${VALUE1}#${VALUE1},${zkconf%?}#g' ${BEELINE_FILE}"
+    scp ${BEELINE_FILE} root@${host}:${BEELINE_FILE}
 done
 }
-
 #####################################################################
 # 函数名:spark_distribution
 # 描述: 将spark安装包分发到新增节点
@@ -145,9 +165,10 @@ function defaults_conf ()
 {
 for insName in ${HOSTNAMES[@]}
 do
+    VALUE=$(grep "spark.yarn.historyServer.address" ${DEFAULT_CONF_FILE} )
+    VALUE2=${VALUE##* }
     echo "准备修改spark ${insName} 的conf文件"
-    ssh root@${insName} "sed -i 's#historyserver#${insName}#g' ${DEFAULT_CONF_FILE}"
-
+    ssh root@${insName} "sed -i 's#$VALUE2#${insName}:18080#g' ${DEFAULT_CONF_FILE}"
 done
 }
 #####################################################################

@@ -39,11 +39,11 @@ for name in ${CLUSTER_HOSTNAME_ARRY[@]}
 do
     echo ""  | tee  -a  $LOG_FILE
     echo "**************************************************"  | tee  -a  $LOG_FILE
-    echo "准备关闭节点${name}的防火墙"    | tee -a $LOG_FILE
+    echo "准备关闭节点$name的防火墙"    | tee -a $LOG_FILE
     ssh root@$name "sed -i \"s;enforcing;disabled;g\" /etc/selinux/config "
     ssh root@$name 'service iptables stop'
     ssh root@$name 'chkconfig iptables off'
-    echo "关闭防火 ${name} 的防火墙成功。"  | tee -a $LOG_FILE
+    echo "关闭防火 $name 的防火墙成功。"  | tee -a $LOG_FILE 
 done
 
 

@@ -64,7 +64,6 @@ sleep 5s
 for name_host in ${hostname_arr[@]}
 do
     ssh root@$name_host "${INSTALL_HOME}/Hadoop/hadoop/sbin/hadoop-daemon.sh start journalnode"
-    ssh root@$name_host "${INSTALL_HOME}/Hadoop/hadoop/bin/hdfs namenode -initializeSharedEdits"
     if [ $? -ne 0 ];then
         echo  "start journalnode in $name_host failed"
         exit 1 

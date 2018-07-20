@@ -91,6 +91,7 @@ do
     echo "************************************************"
     echo "准备将ROCKETMQ分发到节点$insName："  | tee -a $LOG_FILE
     echo "rocketmq 分发中,请稍候......"  | tee -a $LOG_FILE
+    ssh ${insName} "rm -rf ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties"
     scp -r ${ROCKETMQ_INSTALL_HOME} root@${insName}:${INSTALL_HOME} > /dev/null
     echo "rocketmq 分发完毕......"  | tee -a $LOG_FILE
 done
@@ -128,14 +129,8 @@ for insName in ${HOSTNAMES[@]}
 do
     echo "************************************************"
     #echo "准备修改$hostname节点下的broker配置文件：" | tee -a $LOG_FILE
-    Properties_Num=$(ssh root@${insName} "ls ${ROCKETMQ_HOME}/conf/2m-noslave | grep .properties | wc -l")
-    if [ ${Properties_Num} != 1 ];then
-        echo "${insName}节点下的broker配置文件数目不为1,请检视......" | tee -a $LOG_FILE
-        exit 0
-    else
         ## 修改 $hostname 节点下的 broker 配置文件名字
-        ssh root@${insName} "mv ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
-
+ssh root@${insName} "mv ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
         ## 修改 broker 配置文件中的 brokername
         ssh root@${insName} "sed -i 's#^brokerName=.*#brokerName="broker-${insName}"#g' ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
 
@@ -167,7 +162,7 @@ do
         flag7=$?
 
         ## 添加brokerIP1
-		ssh root@${insName} "sed -i 's#brokerIP1=#brokerIP1=${insName}g' ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
+		ssh root@${insName} "sed -i 's#brokerIP1=.*#brokerIP1=${insName}#g' ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
 		flag8=$?
 
 		if [[ ($flag1 == 0) && ($flag2 == 0) && ($flag3 == 0) && ($flag4 == 0) && ($flag5 == 0) && ($flag6 == 0) && ($flag7 == 0) && ($flag8 == 0) ]];then
@@ -175,27 +170,9 @@ do
         else
             echo "配置brokerproperties失败." | tee -a $LOG_FILE
         fi
-    fi
     echo "修改${insName}节点下的broker配置文件完成" | tee -a $LOG_FILE
 done
 }
-
-## 将RocketMQ的UI地址写到指定文件中
-echo "" | tee -a $LOG_FILE
-echo "**********************************************" | tee -a $LOG_FILE
-echo "准备将RocketMQ的UI地址写到指定文件中............" | tee -a $LOG_FILE
-RocketMQWebUI_Dir=$(grep WebUI_Dir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
-RocketMQ_UI="http://${NameServer_IP}:8083"
-mkdir -p ${RocketMQWebUI_Dir}
-grep -q "RocketMQUI_Address=" ${RocketMQWebUI_Dir}/WebUI_Address
-if [ "$?" -eq "0" ] ;then
-    sed -i "s#^RocketMQUI_Add0ress=.*#RocketMQUI_Address=${RocketMQ_UI}#g" ${RocketMQWebUI_Dir}/WebUI_Address
-else
-    echo "##RocketMQ_WebUI" >> ${RocketMQWebUI_Dir}/WebUI_Address
-    echo "RocketMQUI_Address=${RocketMQ_UI}" >> ${RocketMQWebUI_Dir}/WebUI_Address
-fi
-
-#####################################################################
 # 函数名: main
 # 描述: 脚本主要业务入口
 # 参数: N/A
