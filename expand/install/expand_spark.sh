@@ -56,9 +56,30 @@ SERVICE_HOSTS=(${SPARK_SERVICENODE//;/ })
 SPARK_HOSTNAME_LISTS=${SPARK_NAMENODE}";"${SPARK_SERVICENODE}
 SPARK_HOSTNAME_ARRY=(${SPARK_HOSTNAME_LISTS//;/ })
 
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 spark 扩展安装操作 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
+
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
 fi
+
+#####################################################################
+# 函数名:spark_distribution
+# 描述: 将spark安装包分发到新增节点
+# 参数: N/A
+# 返回值: N/A
+# 其他: N/A
+#####################################################################
+function spark_distribution ()
+{
+for insName in ${HOSTNAMES[@]}
+do
+    echo "准备将 spark 发到新增节点 ${insName} ..." | tee -a $LOG_FILE
+    scp -r ${SPARK_INSTALL_HOME} root@${insName}:${INSTALL_HOME} > /dev/null
+    echo "分发到新增 ${insName} 节点完毕！！！" | tee -a $LOG_FILE
+done
+}
 
 #####################################################################
 # 函数名:spark_env
@@ -82,12 +103,13 @@ else
     sed -i "s#${VALUE}#${VALUE},${zkconf%?}#g" ${SPARK_ENV_FILE}
 fi
 
-## 拷贝到原节点
+## 拷贝到所有节点
 for host in ${INSTALL_HOSTNAMES[@]};
 do
     scp ${SPARK_ENV_FILE} root@${host}:${SPARK_ENV_FILE}
 done
 }
+
 #####################################################################
 # 函数名:salves
 # 描述: 修改salves文件
@@ -108,7 +130,7 @@ do
         echo ${insName} >> ${SLAVES_FILE}
     fi
 done
-## 拷贝到原节点
+## 拷贝到所有节点
 for host in ${INSTALL_HOSTNAMES[@]};
 do
     scp ${SLAVES_FILE} root@${host}:${SLAVES_FILE}
@@ -131,28 +153,13 @@ if [ -n "${VALUE2}" ];then
 else
     sed -i "s#${VALUE1}#${VALUE1},${zkconf%?}#g" ${BEELINE_FILE}
 fi
-## 拷贝到原节点
+## 拷贝到所有节点
 for host in ${INSTALL_HOSTNAMES[@]};
 do
     scp ${BEELINE_FILE} root@${host}:${BEELINE_FILE}
 done
 }
-#####################################################################
-# 函数名:spark_distribution
-# 描述: 将spark安装包分发到新增节点
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function spark_distribution ()
-{
-for insName in ${HOSTNAMES[@]}
-do
-    echo "准备将spark发到新增节点 ${insName} ..." | tee -a $LOG_FILE
-    scp -r ${SPARK_INSTALL_HOME} root@${insName}:${INSTALL_HOME} > /dev/null
-    echo "分发到新增 ${insName} 节点完毕！！！" | tee -a $LOG_FILE
-done
-}
+
 
 #####################################################################
 # 函数名:defaults_conf
@@ -167,6 +174,8 @@ for insName in ${HOSTNAMES[@]}
 do
     VALUE=$(grep "spark.yarn.historyServer.address" ${DEFAULT_CONF_FILE} )
     VALUE2=${VALUE##* }
+    echo $VALUE2
+    echo "value为："${VALUE}
     echo "准备修改spark ${insName} 的conf文件"
     ssh root@${insName} "sed -i 's#$VALUE2#${insName}:18080#g' ${DEFAULT_CONF_FILE}"
 done
@@ -180,10 +189,10 @@ done
 #####################################################################
 function main ()
 {
+spark_distribution
 spark_env
 salves
 spark_beeline
-spark_distribution
 defaults_conf
 }
 
@@ -194,3 +203,6 @@ defaults_conf
 echo "" | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")" | tee  -a  $LOG_FILE
 main
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "spark 扩展安装操作完成 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE

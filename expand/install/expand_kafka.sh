@@ -26,7 +26,7 @@ LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 LOG_FILE=${LOG_DIR}/expand_kafka.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
-## 原集群节点
+## 所有集群节点
 INSTALL=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
 INSTALL_HOSTNAMES=(${INSTALL//;/ })
 ## bigdata 目录
@@ -56,9 +56,7 @@ KAFKA_HOSTNAME_ARRY=(${KAFKA_HOSTNAME_LISTS//;/ })
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 echo "读取的新增集群节点IP为："${CLUSTER_HOST} | tee -a $LOG_FILE
 HOSTNAMES=(${CLUSTER_HOST//;/ })
-## 原集群节点和新增节点
-Host_Arr=${INSTALL}";"${CLUSTER_HOST}
-Host_Arrs=(${Host_Arr//;/ })
+
 ## server.properties文件节点名称
 SERVER_HOSTS=$(grep zookeeper.connect= ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2)
 SERVER_HOSTNAMES=(${SERVER_HOSTS//;/ })
@@ -81,6 +79,27 @@ if [ ! -d $KAFKA_LOG ];then
 fi
 
 #####################################################################
+# 函数名:kafka_distribution
+# 描述: 将kafka安装包分发到每个节点
+# 参数: N/A
+# 返回值: N/A
+# 其他: N/A
+#####################################################################
+function kafka_distribution ()
+{
+for insName in ${INSTALL_HOSTNAMES[@]}
+do
+    echo "准备将kafka发到新增节点 ${insName} ..." | tee -a $LOG_FILE
+    # ssh root@$insName "mkdir -p ${KAFKA_INSTALL_HOME}"
+    # rsync -rvl ${KAFKA_SOURCE_DIR}/$insName/kafka $insName:${KAFKA_INSTALL_HOME}  > /dev/null
+    # ssh root@$insName "chmod -R 755 ${KAFKA_HOME}"
+    ssh root@${insName} "mkdir -p ${BIGDATA}"
+    scp -r ${KAFKA_INSTALL_HOME} root@${insName}:${BIGDATA} > /dev/null
+    echo "分发到新增 ${insName} 节点完毕！！！" | tee -a $LOG_FILE
+done
+}
+
+#####################################################################
 # 函数名:zookeeper_connect
 # 描述: 修改 server_properties 文件中的 zookeeper.connect
 # 参数: N/A
@@ -98,6 +117,7 @@ do
         sed -i "s#zookeeper.connect=${VALUE}#zookeeper.connect=${VALUE},${insName}:2181#g" ${KAFKA_SERVER_PROPERTIES}
     fi
 done
+
 }
 #####################################################################
 # 函数名:producer_properties
@@ -116,11 +136,6 @@ do
         value=$(grep bootstrap.servers ${KAFKA_PRODUCER_PROPERTIES} | cut -d '=' -f2)
         sed -i "s#bootstrap.servers=${value}#bootstrap.servers=${value},${insName}:9092#g" ${KAFKA_PRODUCER_PROPERTIES}
     fi
-done
-## 拷贝到原节点
-for host in ${INSTALL_HOSTNAMES[@]};
-do
-scp ${KAFKA_PRODUCER_PROPERTIES} root@${host}:${KAFKA_PRODUCER_PROPERTIES}
 done
 }
 
@@ -142,34 +157,8 @@ do
         sed -i "s#kafka-manager.zkhosts=\"${value}\"#kafka-manager.zkhosts=\"${value},${insName}:2181\"#g" ${KAFKA_APPLICATION_CONF}
     fi
 done
-
-## 拷贝到原节点
-for host in ${INSTALL_HOSTNAMES[@]};
-do
-scp ${KAFKA_APPLICATION_CONF} root@${host}:${KAFKA_APPLICATION_CONF}
-done
 }
 
-#####################################################################
-# 函数名:kafka_distribution
-# 描述: 将kafka安装包分发到每个节点
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function kafka_distribution ()
-{
-for insName in ${HOSTNAMES[@]}
-do
-    echo "准备将kafka发到新增节点 ${insName} ..." | tee -a $LOG_FILE
-    # ssh root@$insName "mkdir -p ${KAFKA_INSTALL_HOME}"
-    # rsync -rvl ${KAFKA_SOURCE_DIR}/$insName/kafka $insName:${KAFKA_INSTALL_HOME}  > /dev/null
-    # ssh root@$insName "chmod -R 755 ${KAFKA_HOME}"
-    ssh root@${insName} "mkdir -p ${BIGDATA}"
-    scp -r ${KAFKA_INSTALL_HOME} root@${insName}:${BIGDATA} > /dev/null
-    echo "分发到新增 ${insName} 节点完毕！！！" | tee -a $LOG_FILE
-done
-}
 
 #####################################################################
 # 函数名:server_properties
@@ -183,18 +172,13 @@ LOG_DIRS=/opt/hzgc/logs/kafka/kafka-logs
 function server_properties ()
 {
 num=1
-for insName in ${Host_Arrs[@]}
+for insName in ${INSTALL_HOSTNAMES[@]}
 do
     ##修改 brokerID
     echo "正在修改${insName}的 broker.id ..." | tee -a $LOG_FILE
-    value1=`ssh root@${insName} "grep 'broker.id' ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2"`
     ssh root@${insName} "sed -i 's#broker.id=.*#broker.id=${num}#g' ${KAFKA_SERVER_PROPERTIES}"
     echo "${insName}的 broker.id 配置修改完毕！！！" | tee -a $LOG_FILE
-   num=$(($num+1))
-done
-echo "##########################"
-for insName in ${HOSTNAMES[@]}
-do
+
     ##修改 listeners
     echo "正在修改${insName}的 listeners ..." | tee -a $LOG_FILE
     value2=`ssh root@${insName} "grep 'listeners=PLAINTEXT' ${KAFKA_SERVER_PROPERTIES} | cut -d ':' -f2| sed -n '1p;1q'"`
@@ -206,7 +190,8 @@ do
     value3=`ssh root@${insName} "grep 'log.dirs' ${KAFKA_SERVER_PROPERTIES} | cut -d '=' -f2"`
     ssh root@${insName} "sed -i 's#log.dirs=${value3}#log.dirs=${LOG_DIRS}#g' ${KAFKA_SERVER_PROPERTIES}"
     echo "${insName}的 log.dirs 配置修改完毕！！！" | tee -a $LOG_FILE
-    num=$(($num+1))
+
+   num=$(($num+1))
 done
 }
 #####################################################################

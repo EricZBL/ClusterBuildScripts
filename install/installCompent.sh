@@ -19,10 +19,11 @@ ROOT_HOME=`pwd`
 ##配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 
+cd ${BIN_DIR}
+
 #检查selinux状态
 sh selinuxStatus.sh
 
-cd ${BIN_DIR}
 ##安装mysql
 sh mysqlInstall.sh
 

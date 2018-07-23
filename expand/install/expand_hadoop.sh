@@ -68,9 +68,9 @@ datanode_arr=(${Hadoop_Data//;/ })
 HADOOP_IP_LISTS=${Hadoop_Data}
 for node in ${namenode_arr};do
     if [[ ${Hadoop_Data} =~ ${node} ]]; then
-        echo "###########"
+        echo ""
     else
-        HADOOP_IP_LISTS=$(${Hadoop_Data}\;${node})
+        HADOOP_IP_LISTS=${Hadoop_Data}";"${node}
 
     fi
 done

@@ -26,7 +26,7 @@ LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 LOG_FILE=${LOG_DIR}/expand_zookeeper.log
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
-## 原集群节点
+## 所有集群节点
 INSTALL=$(grep Cluster_HostName ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
 INSTALL_HOSTNAMES=(${INSTALL//;/ })
 ## 集群新增节点主机名，放入数组中
@@ -36,7 +36,6 @@ HOSTNAMES=(${CLUSTER_HOST//;/ })
 ## 原集群节点和新增节点
 Host_Arr=${INSTALL}";"${CLUSTER_HOST}
 Host_Arrs=(${Host_Arr//;/ })
-
 ## ZOOKEEPER_INSTALL_HOME zookeeper 安装目录
 ZOOKEEPER_INSTALL_HOME=${INSTALL_HOME}/Zookeeper
 ## ZOOKEEPER_HOME  zookeeper 根目录
@@ -101,20 +100,15 @@ do
     ## 修改 zoo.cfg
     value1=$(grep "${insName}"  ${ZOO_CFG_FILE})
     if [ -n "${value1}" ];then
-        sed -i "s#server.${NUMBER}=.*#server.${NUMBER}=${insName}:2888:3888#g"  ${ZOO_CFG_FILE}
+        sed -i "s#server.${NUMBER}=.*#server.${NUMBER}=${insName}:2888:3888#g" ${ZOO_CFG_FILE}
     else
         echo "server.${NUMBER}=${insName}:2888:3888" >> ${ZOO_CFG_FILE}
     fi
 
     NUMBER=$[${NUMBER}+1]
 done
-## 拷贝到原节点
+## 拷贝到其他节点
 for host in ${INSTALL_HOSTNAMES[@]};
-do
-scp ${ZOO_CFG_FILE} root@${host}:${ZOO_CFG_FILE}
-done
-## 拷贝到新增节点
-for host in ${HOSTNAMES[@]};
 do
 scp ${ZOO_CFG_FILE} root@${host}:${ZOO_CFG_FILE}
 done
@@ -130,7 +124,7 @@ done
 function myid ()
 {
 num=1
-for insName in ${Host_Arrs[@]}
+for insName in ${INSTALL_HOSTNAMES[@]}
 do
     ##修改 myid
     echo "正在修改${insName}的 myid ..." | tee -a $LOG_FILE

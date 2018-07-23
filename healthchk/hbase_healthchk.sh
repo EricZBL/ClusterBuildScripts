@@ -17,5 +17,5 @@ ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 
-source source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'HMaster|HRegionServer|jps show as bellow'

@@ -84,22 +84,32 @@ function config_yarn_site_xml ()
     echo "****************************************************"  | tee -a $LOG_FILE
 	cd ${YARN_SITE_XML_DIR}
 	echo "进入${YARN_SITE_XML_DIR}目录，准备配置yarn-site.xml"  |  tee -a $LOG_FILE
-	if [ -f "${YARN_SITE_XML}" ]; then
-		## 配置yarn nodeManager 可以支配的最大内存
-		grep -q "yarn.nodemanager.resource.memory-mb" ${YARN_SITE_XML}
-		if [[ $? -eq 0 ]]; then
-	            num3=$[ $(cat yarn-site.xml  | cat -n | grep  yarn.nodemanager.resource.memory-mb | awk '{print $1}') + 1 ]
-		    sed -i "${num3}c ${VALUE}${YARN_MAX_MEN}${VALUE_END}" ${YARN_SITE_XML}
-		fi
-                ## 配置nodemanager可用的最大核数
-		grep -q "yarn.nodemanager.resource.cpu-vcores" ${YARN_SITE_XML}
-		if [[ $? -eq 0 ]]; then
-		    num6=$[ $(cat yarn-site.xml  | cat -n | grep  yarn.nodemanager.resource.cpu-vcores | awk '{print $1}') + 1 ]
-		    sed -i "${num6}c ${VALUE}${CORES}${VALUE_END}" ${YARN_SITE_XML}
-		fi
-        else
-		echo "Not Found \"${YARN_SITE_XML_DIR}\" or \"${BIN_DIR}/chenke.sb\" file!"  |  tee -a $LOG_FILE
-	fi
+	for node in ${HOSTNAMES};do
+	    ## 获取当前机器core数量
+        CORES=`ssh root@node "cat /proc/cpuinfo| grep 'processor'| wc -l"`
+        ## 获取当前机器内存
+        MEM=`ssh root@$node "echo $(free -h | grep 'Mem' | awk '{print $2}')"`
+        MEMORY=${CMD%?}
+        ## yarn node manager 的最大内存
+        YARN_MAX_MEN=$(echo `echo "scale=1;${MEMORY}*0.8*1024"|bc`  | awk -F "." '{print $1}')
+	    if [ -f "${YARN_SITE_XML}" ]; then
+	    	## 配置yarn nodeManager 可以支配的最大内存
+	    	grep -q "yarn.nodemanager.resource.memory-mb" ${YARN_SITE_XML}
+	    	if [[ $? -eq 0 ]]; then
+	                num3=$[ $(cat yarn-site.xml  | cat -n | grep  yarn.nodemanager.resource.memory-mb | awk '{print $1}') + 1 ]
+	    	    sed -i "${num3}c ${VALUE}${YARN_MAX_MEN}${VALUE_END}" ${YARN_SITE_XML}
+	    	fi
+                    ## 配置nodemanager可用的最大核数
+	    	grep -q "yarn.nodemanager.resource.cpu-vcores" ${YARN_SITE_XML}
+	    	if [[ $? -eq 0 ]]; then
+	    	    num6=$[ $(cat yarn-site.xml  | cat -n | grep  yarn.nodemanager.resource.cpu-vcores | awk '{print $1}') + 1 ]
+	    	    sed -i "${num6}c ${VALUE}${CORES}${VALUE_END}" ${YARN_SITE_XML}
+		    fi
+            else
+		    echo "Not Found \"${YARN_SITE_XML_DIR}\" or \"${BIN_DIR}/chenke.sb\" file!"  |  tee -a $LOG_FILE
+	    fi
+	done
+
 	echo "置yarn-site.xml完成!!!!!!"  | tee -a $LOG_FILE
 }
 
