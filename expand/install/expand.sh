@@ -13,7 +13,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 ## 主集群配置文件目录
@@ -44,7 +44,8 @@ function main()
         fi
     done
 
-     ## 扩展Zookeeper
+    ## 扩展Zookeeper
+    echo  "开始在扩展加点上安装zookeeper服务"
     Is_Zookeeper=$(grep Is_Zookeeper_InstallNode ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_Zookeeper" = "xyes" ] ;then
         sh syncConf.sh zookeeper
@@ -52,6 +53,7 @@ function main()
     fi
 
     ## 扩展datanode
+    echo  "开始在扩展加点上安装datanode服务"
     IS_DataNode=$(grep Is_Hadoop_DataNode ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$IS_DataNode" = "xyes" ] ;then
 	    sh syncConf.sh datanode
@@ -59,6 +61,7 @@ function main()
     fi
 
     ## 扩展nodemanager
+    echo  "开始在扩展加点上安装nodemanager服务"
     IS_NodeManager=$(grep Is_Yarn_NodeManager ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$IS_NodeManager" = "xyes" ] ;then
         sh syncConf.sh nodemanager
@@ -66,6 +69,7 @@ function main()
     fi
 
     ## 扩展regionserver
+    echo  "开始在扩展加点上安装regionserver服务"
     Is_RegionServer=$(grep Is_HBase_HRegionServer ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_RegionServer" = "xyes" ] ;then
         sh syncConf.sh regionserver
@@ -73,6 +77,7 @@ function main()
     fi
 
     ## 扩展hive
+    echo  "开始在扩展加点上安装hive服务"
     IS_HIVE=$(grep Is_Meta_ThriftServer ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$IS_HIVE" = "xyes" ] ;then
         sh syncConf.sh hive
@@ -80,6 +85,7 @@ function main()
     fi
 
     ## 扩展kafka
+    echo  "开始在扩展加点上安装kafka服务"
     Is_Kafka=$(grep Is_Kafka_InstallNode ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_Kafka" = "xyes" ] ;then
         sh syncConf.sh kafka
@@ -87,6 +93,7 @@ function main()
     fi
 
     ## 扩展Scala
+    echo  "开始在扩展加点上安装scala服务"
     Is_Scala=$(grep Is_Scala_InstallNode ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_Scala" = "xyes" ] ;then
         sh syncConf.sh scala
@@ -94,6 +101,7 @@ function main()
     fi
 
 	## 扩展Spark
+	echo  "开始在扩展加点上安装spark服务"
     Is_Spark=$(grep Is_Spark_ServiceNode ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_Spark" = "xyes" ] ;then
         sh syncConf.sh spark
@@ -101,6 +109,7 @@ function main()
     fi
 
     ## 扩展Rocketmq
+    echo  "开始在扩展加点上安装rocketmq服务"
     Is_Rocketmq=$(grep Is_RocketMQ_Broker ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_Rocketmq" = "xyes" ] ;then
         sh syncConf.sh rocketmq
@@ -108,6 +117,7 @@ function main()
     fi
 
     ## 扩展ES
+    echo  "开始在扩展加点上安装es服务"
     Is_ES=$(grep Is_ES_InstallNode ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
     if [ "x$Is_ES" = "xyes" ] ;then
         sh syncConf.sh es

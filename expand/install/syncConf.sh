@@ -13,7 +13,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 ## 主集群配置文件目录
@@ -32,8 +32,9 @@ component=$1
 
 function main()
 {
-##在主配置文件中追加
+##在主配置文件中追加组件节点
     if [[ "$component" = "datanode" ]] ; then
+        echo "扩展节点安装datanode服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
             DATANODE=$(grep Hadoop_DataNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
             if [[ "$DATANODE" =~ "$node" ]] ; then
@@ -45,6 +46,7 @@ function main()
         done
     fi
     if [[ "$component" = "nodemanager" ]] ; then
+        echo "扩展节点安装nodemanager服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
             NODEMANAGER=$(grep Yarn_NodeManager ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
             if [[ "$NODEMANAGER" =~ "$node" ]] ; then
@@ -63,6 +65,7 @@ function main()
     fi
 
     if [[ "$component" = "hive" ]] ; then
+        echo "扩展节点安装hive服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
             HIVE=$(grep Meta_ThriftServer ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
             if [[ "$HIVE" =~ "$node" ]] ; then
@@ -74,6 +77,7 @@ function main()
         done
     fi
     if [[ "$component" = "regionserver" ]] ; then
+        echo "扩展节点安装regionserver服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              REGIONSERVER=$(grep HBase_HRegionServer ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$REGIONSERVER" =~ "$node" ]] ; then
@@ -85,6 +89,7 @@ function main()
          done
     fi
     if [[ "$component" = "es" ]] ; then
+        echo "扩展节点安装ES服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              ES=$(grep ES_InstallNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$ES" =~ "$node" ]] ; then
@@ -96,6 +101,7 @@ function main()
         done
     fi
     if [[ "$component" = "kafka" ]];then
+        echo "扩展节点安装kafka服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              KAFKA=$(grep Kafka_InstallNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$KAFKA" =~ "$node" ]] ; then
@@ -107,6 +113,7 @@ function main()
         done
     fi
     if [[ "$component" = "rocketmq" ]] ; then
+        echo "扩展节点安装rocketmq服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              ROCKETMQ=$(grep RocketMQ_Broker ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$ROCKETMQ" =~ "$node" ]] ; then
@@ -119,6 +126,7 @@ function main()
     fi
 
     if [[ "$component" = "zookeeper" ]] ; then
+        echo "扩展节点安装zookeeper服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              ZOOKEEPER=$(grep Zookeeper_InstallNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$ZOOKEEPER" =~ "$node" ]] ; then
@@ -130,6 +138,7 @@ function main()
         done
     fi
     if [[ "$component" = "scala" ]] ; then
+        echo "扩展节点安装scala服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              SCALA=$(grep Scala_InstallNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$SCALA" =~ "$node" ]] ; then
@@ -142,6 +151,7 @@ function main()
     fi
 
     if [[ "$component" = "spark" ]] ; then
+        echo "扩展节点安装spark服务，在主配置文件中添加"
         for node in ${EXPAND_NODE_ARRY[@]}; do
              SPARK=$(grep Spark_ServiceNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
              if [[ "$SPARK" =~ "$node" ]] ; then
@@ -149,19 +159,6 @@ function main()
 		     else
                  sed -i "s#Spark_ServiceNode=$SPARK#Spark_ServiceNode=$SPARK;$node#g" ${ROOT_HOME}/conf/cluster_conf.properties
                  echo "在主配置文件Spark中加入节点:$node"
-             fi
-        done
-    fi
-
-
-    if [[ "$component" = "haproxy" ]] ; then
-        for node in ${EXPAND_NODE_ARRY[@]}; do
-             HAPROXY=$(grep HAproxy_ServiceNode ${ROOT_HOME}/conf/cluster_conf.properties |cut -d '=' -f2)
-             if [[ "$HAPROXY" =~ "$node" ]] ; then
-                 echo "配置文件中已存在此节点:$node"
-		     else
-                 sed -i "s#HAproxy_ServiceNode=$HAPROXY#HAproxy_ServiceNode=$HAPROXY;$node#g" ${ROOT_HOME}/conf/cluster_conf.properties
-                 echo "在主配置文件HAproxy中加入节点:$node"
              fi
         done
     fi

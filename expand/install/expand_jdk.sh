@@ -13,7 +13,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 echo ${ROOT_HOME}
@@ -35,6 +35,10 @@ HOSTNAMES=(${CLUSTER_HOST//;/ })
 JAVA_INSTALL_HOME=${INSTALL_HOME}/JDK
 ## JAVA_HOME  jdk 根目录
 JAVA_HOME=${INSTALL_HOME}/JDK/jdk
+
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 jdk 扩展安装操作 ing~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 mkdir -p ${JAVA_INSTALL_HOME}
 mkdir -p ${LOG_DIR}
@@ -82,5 +86,7 @@ do
     fi
     ssh root@${jdk_host} "source /etc/profile"
 done
-
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo " jdk 扩展安装操作完成 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 set +x

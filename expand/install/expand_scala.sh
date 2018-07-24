@@ -15,7 +15,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## ClusterBuildScripts 目录
 CLUSTER_BUILD_SCRIPTS_DIR=`pwd`
 ## expand conf 配置文件目录
@@ -35,6 +35,11 @@ SCALA_INSTALL_HOME=${INSTALL_HOME}/Scala
 ## Scala_HOME  scala根目录
 SCALA_HOME=${INSTALL_HOME}/Scala/scala
 
+
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo "准备进行 scala 扩展安装操作 ing~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
 fi
@@ -53,3 +58,7 @@ do
     scp -r ${SCALA_INSTALL_HOME} root@${scala_host}:${INSTALL_HOME} > /dev/null
     echo "分发到节点${scala_host}完毕" | tee -a $LOG_FILE
 done
+
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo " scala 扩展安装操作完成 zzZ~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE

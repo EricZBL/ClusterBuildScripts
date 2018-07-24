@@ -18,7 +18,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 export BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 export ROOT_HOME=`pwd`
 ## 配置文件目录

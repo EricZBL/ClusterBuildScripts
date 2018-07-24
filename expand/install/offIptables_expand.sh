@@ -15,7 +15,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## ClusterBuildScripts 目录
 CLUSTER_BUILD_SCRIPTS_DIR=`pwd`
 ## 配置文件目录

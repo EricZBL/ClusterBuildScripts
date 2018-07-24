@@ -15,7 +15,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 ## 配置文件目录
@@ -47,6 +47,10 @@ HIVE_HOME=${INSTALL_HOME}/Hive/hive
 VALUE="<value>"
 ## </value>
 VALUE_END="</value>"
+
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 hive 扩展安装操作 ing~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
@@ -184,4 +188,7 @@ function main()
     writeUI_file
 }
 main
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo " hive 扩展安装操作完成 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 set +x

@@ -15,7 +15,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## ClusterBuildScripts 目录
 CLUSTER_BUILD_SCRIPTS_DIR=`pwd`
 ## 配置文件目录
@@ -29,6 +29,10 @@ ETC_FILE=/opt/source
 ## 集群所有节点主机名，放入数组中
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 HOSTNAMES=(${CLUSTER_HOST//;/ })
+
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 删除各个节点上/etc/profile中的Java环境变量操作 ing~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 mkdir -p ${LOG_DIR}
 
@@ -165,3 +169,6 @@ echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"   | tee -a $LOG_FILE
 
 main
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "删除各个节点上/etc/profile中的Java环境变量操作完成 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE

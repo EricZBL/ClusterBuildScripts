@@ -15,7 +15,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## ClusterBuildScripts 目录
 CLUSTER_BUILD_SCRIPTS_DIR=`pwd`
 ## expand conf 配置文件目录
@@ -58,6 +58,11 @@ NameServer_Host=$(grep RocketMQ_Namesrv ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluste
 Broker_Hosts=$(grep RocketMQ_Broker ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
 Broker_Hostarr=(${Broker_Hosts//;/ })
 NameServer_IP=$(cat /etc/hosts|grep "$NameServer_Host" | awk '{print $1}')
+
+
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo " 准备进行 rocketmq 扩展安装操作 ing~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE
 
 Host_Arr=(${Broker_Hostarr[*]} ${NameServer_Host})
 
@@ -193,3 +198,7 @@ noslave_broker
 echo "" | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")" | tee  -a $LOG_FILE
 main
+
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo " rocketmq 扩展安装操作完成 zzZ~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE

@@ -14,7 +14,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 ## 配置文件目录
@@ -58,6 +58,11 @@ HADOOP_HOME=${INSTALL_HOME}/Hadoop/hadoop
 VALUE="<value>"
 ## </value>
 VALUE_END="</value>"
+
+
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo "准备进行 hbase 扩展安装操作 ing~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE
 
 ## 设置和获取HBase 集群的配置
 mkdir -p ${HBASE_HOME}
@@ -165,4 +170,7 @@ function main()
 
 main
 
+echo "-------------------------------------" | tee  -a  $LOG_FILE
+echo "hbase 扩展安装操作完成 zzZ~" | tee  -a  $LOG_FILE
+echo "-------------------------------------" | tee  -a  $LOG_FILE
 set +x

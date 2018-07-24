@@ -13,7 +13,7 @@
 cd `dirname $0`
 ## BIN目录，脚本所在的目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 ## 配置文件目录

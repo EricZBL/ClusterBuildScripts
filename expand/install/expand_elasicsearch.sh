@@ -19,7 +19,7 @@
 cd `dirname $0`
 ## 脚本所在目录：install
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录：
 ROOT_HOME=`pwd`
 ## 配置文件目录：conf
@@ -47,6 +47,11 @@ EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
 ## 获取es的安装节点，放入数组中
 ES_HOSTNAME_LISTS=$(grep ES_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ES_HOSTNAME_ARRY=(${ES_HOSTNAME_LISTS//;/ })
+
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 es 扩展安装操作 ing~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
+
 
 ## 创建ELASTIC的安装目录
 mkdir -p ${ELASTIC_HOME}
@@ -205,6 +210,8 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 main
-echo "安装完毕...."                       | tee  -a  $LOG_FILE
 
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo " es 扩展安装操作完成 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 set +x

@@ -11,7 +11,9 @@
 #set -x
 
 cd `dirname $0`
+
 ## 脚本所在目录：../hzgc/service
+cd ..
 BIN_DIR=`pwd`
 cd ..
 ## 安装包根目录：../hzgc/

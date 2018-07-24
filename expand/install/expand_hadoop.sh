@@ -11,7 +11,7 @@
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`
 ## 配置文件目录
@@ -39,6 +39,10 @@ VALUE_END="</value>"
 ## 集群扩展的节点
 EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
+
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo "准备进行 hadoop 扩展安装操作 ing~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 mkdir -p ${HADOOP_HOME}
 
@@ -176,7 +180,9 @@ echo ""  | tee  -a  $LOG_FILE
 echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 main
-
+echo "-------------------------------------" | tee  -a $LOG_FILE
+echo " hadoop 扩展安装操作完成 zzZ~" | tee  -a $LOG_FILE
+echo "-------------------------------------" | tee  -a $LOG_FILE
 
 set +x
 
