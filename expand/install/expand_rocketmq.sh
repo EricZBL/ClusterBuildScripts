@@ -46,7 +46,7 @@ ROCKETMQ_ABORT=${ROCKETMQ_STORE}/abort
 
 ##rocketMq 日志目录
 ROCKETMQ_LOG=$(grep Cluster_LOGSDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
-
+ROCKETMQ_LOG_PATH=${ROCKETMQ_LOG}/rocketmq
 ROCKETMQ_HOSTNAME_ARRY=(${ROCKETMQ_HOSTNAME_LISTS//;/ })
 ## 集群新增节点主机名，放入数组中
 CLUSTER_HOST=$(grep Node_HostName ${CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
@@ -97,6 +97,7 @@ do
     echo "准备将ROCKETMQ分发到节点$insName："  | tee -a $LOG_FILE
     echo "rocketmq 分发中,请稍候......"  | tee -a $LOG_FILE
     ssh ${insName} "rm -rf ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties"
+    ssh root@${insName} "mkdir -p ${ROCKETMQ_LOG_PATH};chmod -R 777 ${ROCKETMQ_LOG_PATH}"
     scp -r ${ROCKETMQ_INSTALL_HOME} root@${insName}:${INSTALL_HOME} > /dev/null
     echo "rocketmq 分发完毕......"  | tee -a $LOG_FILE
 done
@@ -132,10 +133,10 @@ function noslave_broker ()
 {
 for insName in ${HOSTNAMES[@]}
 do
-    echo "************************************************"
-    #echo "准备修改$hostname节点下的broker配置文件：" | tee -a $LOG_FILE
+        echo "************************************************"
+        echo "准备修改${hostname}节点下的broker配置文件：" | tee -a $LOG_FILE
         ## 修改 $hostname 节点下的 broker 配置文件名字
-ssh root@${insName} "mv ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
+        ssh root@${insName} "mv ${ROCKETMQ_HOME}/conf/2m-noslave/*.properties ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
         ## 修改 broker 配置文件中的 brokername
         ssh root@${insName} "sed -i 's#^brokerName=.*#brokerName="broker-${insName}"#g' ${ROCKETMQ_HOME}/conf/2m-noslave/broker-${insName}.properties"
 

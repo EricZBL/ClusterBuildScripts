@@ -19,7 +19,7 @@ ROOT_HOME=`pwd`
 ## 主集群配置文件目录
 CLUSTER_CONF_DIR=${ROOT_HOME}/conf
 ##扩展集群配置文件目录
-EXPAND_CONF_DIR=${BIN_DIR}/conf
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
@@ -74,6 +74,7 @@ function main()
     if [ "x$Is_RegionServer" = "xyes" ] ;then
         sh syncConf.sh regionserver
 		sh expand_regionserver.sh
+		sh expand_phoenix.sh
     fi
 
     ## 扩展hive

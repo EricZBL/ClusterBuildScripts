@@ -34,7 +34,7 @@ ${INSTALL_HOME}/HBase/hbase/bin/start-hbase.sh
 	    echo  -e 'HBase start failed \n'
 	fi
 
-sleep 5s
+sleep 7s
 
 #获取habse的高可用Hmaster主机名
 HBASE_HMASTER=$(grep HBase_Hmaster ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
@@ -47,7 +47,7 @@ ssh root@${HBASE_HMASTER} "${INSTALL_HOME}/HBase/hbase/bin/hbase-daemon.sh start
 
 # 验证HBase是否启动成功
 echo -e "********************验证HBase是否启动成功*********************"
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'HMaster|HRegionServer|jps show as bellow'
 #xcall jps | grep HMaster

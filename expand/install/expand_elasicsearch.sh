@@ -25,7 +25,7 @@ ROOT_HOME=`pwd`
 ## 配置文件目录：conf
 CONF_DIR=${ROOT_HOME}/conf
 ##扩展集群配置文件目录
-EXPAND_CONF_DIR=${BIN_DIR}/conf
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 日记目录：logs
 LOG_DIR=${ROOT_HOME}/logs
 ## elastic 安装日记
@@ -43,10 +43,12 @@ JAVA_HOME=${INSTALL_HOME}/JDK/jdk
 ## 集群扩展的节点
 EXPAND_NODE=$(grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties | cut -d '=' -f2)
 EXPAND_NODE_ARRY=(${EXPAND_NODE//;/ })
-
 ## 获取es的安装节点，放入数组中
 ES_HOSTNAME_LISTS=$(grep ES_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ES_HOSTNAME_ARRY=(${ES_HOSTNAME_LISTS//;/ })
+## es log目录
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+ES_LOG_PATH=${LOGS_PATH}/elastic
 
 echo "-------------------------------------" | tee  -a $LOG_FILE
 echo "准备进行 es 扩展安装操作 ing~" | tee  -a $LOG_FILE
@@ -108,7 +110,10 @@ function rsync_file(){
 	for hostname in ${EXPAND_NODE_ARRY[@]};do
 		ssh root@${hostname}  "mkdir -p ${ELASTIC_INSTALL_HOME}"
 		rsync -rvl ${ELASTIC_SOURCE_DIR}/elastic   root@${hostname}:${ELASTIC_INSTALL_HOME}  >/dev/null
-		ssh root@${hostname}  "chmod -R 755   ${ELASTIC_INSTALL_HOME}"  ## 修改拷过去的文件夹权限为可执行
+		## 修改拷过去的文件夹权限为可执行
+		ssh root@${hostname}  "chmod -R 755   ${ELASTIC_INSTALL_HOME}"
+		##创建es日志目录并修改权限
+		ssh root@${hostname} "mkdir -p ${ES_LOG_PATH};chmod -R 777 ${ES_LOG_PATH}"
 	done
 
 	for hostname in ${ES_HOSTNAME_ARRY[@]};do

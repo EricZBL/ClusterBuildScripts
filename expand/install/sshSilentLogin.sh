@@ -24,7 +24,7 @@ export ROOT_HOME=`pwd`
 ## 配置文件目录
 export CONF_DIR=${ROOT_HOME}/conf
 ##扩展集群配置文件目录
-export EXPAND_CONF_DIR=${BIN_DIR}/conf
+export EXPAND_CONF_DIR=${BIN_DIR}/../conf
 ## 安装日记目录
 export LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
@@ -32,7 +32,7 @@ export LOG_FILE=${LOG_DIR}/no_password.log
 ## 系统root 用密码
 export PASSWORD=$(grep SSH_Password ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ## authorized_keys 内容所在文件
-export AUTHORIZED_KEYS=${BIN_DIR}/authorized_keys.log
+export AUTHORIZED_KEYS=${BIN_DIR}/../authorized_keys.log
 
 ## 集群所有节点主机名，放入数组中
 CLUSTER_HOSTNAME_LISTS=`grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2`\;`grep Node_HostName ${EXPAND_CONF_DIR}/expand_conf.properties|cut -d '=' -f2`

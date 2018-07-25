@@ -21,13 +21,16 @@ ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 ##扩展集群配置文件目录
-EXPAND_CONF_DIR=${BIN_DIR}/conf
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
 LOG_FILE=${LOG_DIR}/hiveInstall.log
 ## hive 安装包目录
 HIVE_SOURCE_DIR=${ROOT_HOME}/component/bigdata
+## 集群组件的日志文件目录 /opt/logs
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+HIVE_LOG_PATH=${LOGS_PATH}/hive
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ## hive的安装节点，放入数组中
@@ -77,6 +80,7 @@ do
     ssh root@${hostname}  "mkdir -p ${HIVE_INSTALL_HOME}"
     rsync -rvl ${HIVE_HOME}   root@${hostname}:${HIVE_INSTALL_HOME}  >/dev/null
     ssh root@${hostname}  "chmod -R 755   ${HIVE_HOME}"
+    ssh root@${hostname} "mkdir -p ${HIVE_LOG_PATH};chmod -R 777 ${HIVE_LOG_PATH}"
 done
     echo "分发hive 安装配置done..."  | tee -a $LOG_FILE
 }

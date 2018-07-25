@@ -49,8 +49,8 @@ else
     echo  -e 'executor stop failed \n'
 fi
 
-# 等待三秒后再验证Azkaban是否启动成功
+# 等待7秒后再验证Azkaban是否停止成功
 echo -e "********************验证Azkaban是否停止成功*********************"
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'AzkabanWebServer|AzkabanExecutorServer|jps show as bellow'

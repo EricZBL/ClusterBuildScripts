@@ -52,14 +52,14 @@ if [ $? -ne 0 ];then
     echo "hdfs zkfc -formatZK 失败................." | tee -a $LOG_FILE
     exit 1;
 fi
-sleep 5s
+sleep 10s
 
 
 echo "**********************************************" | tee -a $LOG_FILE
 echo "启动zkfc....................................."  | tee -a $LOG_FILE
 cd  ${INSTALL_HOME}/Hadoop/hadoop/sbin
 ./hadoop-daemon.sh start zkfc 
-sleep 5s
+sleep 10s
 
 for name_host in ${hostname_arr[@]}
 do
@@ -69,7 +69,7 @@ do
         exit 1 
     fi
 done
-sleep 5s
+sleep 10s
 
 # 格式化namenode
 echo "**********************************************" | tee -a $LOG_FILE
@@ -81,7 +81,7 @@ if [ $? -ne 0 ];then
     exit 1;
 fi
 
-sleep 5s
+sleep 10s
 
 ## 第一次启动
 echo "**********************************************" | tee -a $LOG_FILE
@@ -92,14 +92,14 @@ ${INSTALL_HOME}/Hadoop/hadoop/sbin/start-dfs.sh
 	else 
 	    echo -e 'hdfs failed \n'
 	fi
-sleep 3s
+sleep 7s
 ${INSTALL_HOME}/Hadoop/hadoop/sbin/start-yarn.sh
 	if [ $? -eq 0 ];then
 	    echo -e 'yarn success \n'
 	else 
 	    echo -e 'yarn failed \n'
 	fi
-sleep 3s
+sleep 7s
 ssh root@$MASTER2 "${INSTALL_HOME}/Hadoop/hadoop/sbin/yarn-daemon.sh start resourcemanager"
 	if [ $? -eq 0 ];then
 	    echo -e 'ha yarn success \n'
@@ -116,7 +116,7 @@ echo formate  >> formated
 ##启动mr-historyserver(实现web查看作业的历史运行情况)
 echo "启动mr-historyserver" | tee -a $LOG_FILE
 ${INSTALL_HOME}/Hadoop/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver 
-sleep 5s
+sleep 7s
 
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2) > /dev/null
 xcall jps

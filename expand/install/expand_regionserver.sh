@@ -20,7 +20,7 @@ ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 ##扩展集群配置文件目录
-EXPAND_CONF_DIR=${BIN_DIR}/conf
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记
@@ -29,7 +29,9 @@ LOG_FILE=${LOG_DIR}/hbaseInstall.log
 HBASE_SOURCE_DIR=${ROOT_HOME}/component/bigdata
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-
+## 集群组件的日志文件目录 /opt/logs
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+HBASE_LOG_PATH=${LOGS_PATH}/hbase
 ## hbase的安装节点，需要拼接，放入数组HBASE_HOSTNAME_ARRY中
 HBASE_HMASTER=$(grep HBase_Hmaster ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 HBASE_HREGIONSERVER=$(grep HBase_HRegionServer ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
@@ -152,6 +154,7 @@ function xync_hbase()
         ssh $hostname "mkdir   -p ${HBASE_INSTALL_HOME}"
         rsync -rvl ${HBASE_HOME} root@${hostname}:${HBASE_INSTALL_HOME}  > /dev/null
         ssh $hostname "chmod -R 755 ${HBASE_HOME}"
+        ssh root@${hostname} "mkdir -p ${HBASE_LOG_PATH};chmod -R 777 ${HBASE_LOG_PATH}"
     done
     for hostname in ${HBASE_HOSTNAME_ARRY[@]};do
          scp  ${HBASE_INSTALL_HOME}/hbase/conf/hbase-site.xml  root@${hostname}:${HBASE_INSTALL_HOME}/hbase/conf

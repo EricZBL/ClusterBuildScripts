@@ -24,6 +24,9 @@ CONF_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/expand/conf
 LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 ## 安装日记目录
 LOG_FILE=${LOG_DIR}/expand_zookeeper.log
+## 集群组件的日志文件目录 /opt/logs
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+ZK_LOG_PATH=${LOGS_PATH}/zookeeper
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
 ## 所有集群节点
@@ -80,6 +83,7 @@ do
     echo "准备将zookeeper分发到节点$insName：" | tee -a $LOG_FILE
     echo "zookeeper 分发中,请稍候......" | tee -a $LOG_FILE
     scp -r ${ZOOKEEPER_INSTALL_HOME} root@${insName}:${INSTALL_HOME} > /dev/null
+    ssh root@${insName} "mkdir -p ${ZK_LOG_PATH};chmod -R 777 ${ZK_LOG_PATH}"
     echo "zookeeper 分发完毕......" | tee -a $LOG_FILE
 done
 }
@@ -130,8 +134,7 @@ do
     echo "正在修改${insName}的 myid ..." | tee -a $LOG_FILE
     ssh root@${insName} "sed -i 's#.*#${num}#g'  ${ZOOKEEPER_MYID}"
     echo "${insName}的 myid 配置修改完毕！！！" | tee -a $LOG_FILE
-
-   num=$(($num+1))
+    num=$(($num+1))
 done
 }
 #####################################################################

@@ -56,7 +56,7 @@ echo "停止hive服务完毕."    | tee -a $LOG_FILE
 
 # 验证Hive是否停止成功
 echo -e "********************验证Hive是否停止成功*********************"
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'RunJar|jps show as bellow'
 

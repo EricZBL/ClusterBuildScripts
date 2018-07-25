@@ -27,12 +27,12 @@ LOG_FILE=${LOG_DIR}/kibanaInstall.log
 KIBANA_SOURCE_DIR=${ROOT_HOME}/component/bigdata
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
-## hive的安装节点，放入数组中
+## kibana的安装节点，放入数组中
 KIBANA_NODE=$(grep Kibana_InstallNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 
-## HIVE_INSTALL_HOME hive 安装目录
+## KIBANA_INSTALL_HOME kibana 安装目录
 KIBANA_INSTALL_HOME=${INSTALL_HOME}/Kibana
-## HIVE_HOME  hive 根目录
+## KIBANA_HOME  kibana 根目录
 KIBANA_HOME=${INSTALL_HOME}/Kibana/kibana
 
 
@@ -62,8 +62,8 @@ function mod_conf(){
     sed -i "${num}c server.host:${KIBANA_NODE}" ${KIBANA_HOME}/config/kibana.yml
 
     ## 修改server.name
-    num=`grep -n "server.host:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`
-    sed -i "${num}c server.host:${KIBANA_NODE}" ${KIBANA_HOME}/config/kibana.yml
+    num=`grep -n "server.name:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`
+    sed -i "${num}c server.name:${KIBANA_NODE}" ${KIBANA_HOME}/config/kibana.yml
 
     ## 修改es url
     num=`grep -n "elasticsearch.url:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`

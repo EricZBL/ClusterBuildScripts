@@ -53,12 +53,12 @@ do
 done
 
 
-# 等待三秒后再验证RocketMq是否停止成功
+# 等待7秒后再验证RocketMq是否停止成功
 echo -e "********************验证RocketMq是否停止成功*********************"
 echo -e "验证Namesrv.."
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'NamesrvStartup|jps show as bellow'
 echo -e "验证Broker.."
-sleep 2s
+sleep 7s
 xcall jps | grep -E 'BrokerStartup|jps show as bellow'

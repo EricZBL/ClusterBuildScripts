@@ -17,7 +17,7 @@ ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
 ##扩展集群配置文件目录
-EXPAND_CONF_DIR=${BIN_DIR}/conf
+EXPAND_CONF_DIR=${ROOT_HOME}/expand/conf
 ## 日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## hadoop 安装日记
@@ -30,6 +30,9 @@ INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '
 HADOOP_INSTALL_HOME=${INSTALL_HOME}/Hadoop
 ## HADOOP_HOME  hadoop 根目录
 HADOOP_HOME=${HADOOP_INSTALL_HOME}/hadoop
+## 集群组件的日志文件目录 /opt/logs
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+HADOOP_LOG_PATH=${LOGS_PATH}/hadoop
 ## JAVA_HOME
 JAVA_HOME=${INSTALL_HOME}/JDK/jdk
 ## <value>
@@ -117,12 +120,13 @@ function xync_hadoop()
     echo "hadoop 配置文件分发中，please waiting......"    | tee -a $LOG_FILE
     CLUSTER_HOST=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
     host_arr=(${CLUSTER_HOST//;/ })
-    for host_name in ${EXPAND_NODE_ARRY[@]}
+    for hostname in ${EXPAND_NODE_ARRY[@]}
     do
-        ssh root@$host_name  "rm -rf ${HADOOP_HOME}"
-        rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop  root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
+        ssh root@$hostname  "rm -rf ${HADOOP_HOME}"
+        rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop  root@${hostname}:${HADOOP_INSTALL_HOME}  >/dev/null
         rm -rf ${HADOOP_INSTALL_HOME}/hadoop/tmp/dfs/data/*
-        ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
+        ssh root@$hostname  "chmod -R 755   ${HADOOP_HOME}"
+        ssh root@${hostname} "mkdir -p ${HADOOP_LOG_PATH};chmod -R 777 ${HADOOP_LOG_PATH}"
     done
     for host_name in ${host_arr[@]}
     do

@@ -50,8 +50,8 @@ do
     fi
 done
 
-# 等待五秒后再验证RocketMq是否启动成功
+# 等待7秒后再验证RocketMq是否启动成功
 echo -e "********************验证RocketMq是否启动成功*********************"
-sleep 5s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'NamesrvStartup|BrokerStartup|jps show as bellow'

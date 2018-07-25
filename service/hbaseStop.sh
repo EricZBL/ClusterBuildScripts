@@ -40,6 +40,6 @@ ssh root@${HBASE_HMASTER} "${INSTALL_HOME}/HBase/hbase/bin/hbase-common.sh stop 
 
 # 验证HBase是否停止成功
 echo -e "********************验证HBase是否停止成功*********************"
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'HMaster|HRegionServer|jps show as bellow'

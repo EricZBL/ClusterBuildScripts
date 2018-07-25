@@ -38,7 +38,7 @@ KAFKA_HOME=${INSTALL_HOME}/Kafka/kafka
 
 ##kafka日志目录
 KAFKA_LOG=$(grep Cluster_LOGSDir ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
-
+KAFKA_LOG_PATH=${LOGS_PATH}/kafka
 ## kafka的config目录
 KAFKA_CONFIG=${KAFKA_HOME}/config
 ## kafka的server.properties文件
@@ -95,6 +95,7 @@ do
     # ssh root@$insName "chmod -R 755 ${KAFKA_HOME}"
     ssh root@${insName} "mkdir -p ${BIGDATA}"
     scp -r ${KAFKA_INSTALL_HOME} root@${insName}:${BIGDATA} > /dev/null
+    ssh root@${insName} "mkdir -p ${KAFKA_LOG_PATH};chmod -R 777 ${KAFKA_LOG_PATH}"
     echo "分发到新增 ${insName} 节点完毕！！！" | tee -a $LOG_FILE
 done
 }

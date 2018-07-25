@@ -188,7 +188,7 @@ function xync_hadoop_config()
 {
     echo ""  | tee -a $LOG_FILE
     echo "**********************************************" | tee -a $LOG_FILE
-    echo "hadoop 配置文件分发中，please waiting......"    | tee -a $LOG_FILE
+    echo "分发 hadoop 中，please waiting......"    | tee -a $LOG_FILE
     CLUSTER_HOST=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
     host_arr=(${CLUSTER_HOST//;/ })    
     for host_name in ${host_arr[@]}
@@ -197,7 +197,7 @@ function xync_hadoop_config()
         rsync -rvl ${HADOOP_INSTALL_HOME}/hadoop   root@${host_name}:${HADOOP_INSTALL_HOME}  >/dev/null
         ssh root@$host_name  "chmod -R 755   ${HADOOP_HOME}"
     done 
-    echo "分发hadoop 安装配置done..."  | tee -a $LOG_FILE
+    echo "分发hadoop 完成..."  | tee -a $LOG_FILE
 }
 
 #####################################################################

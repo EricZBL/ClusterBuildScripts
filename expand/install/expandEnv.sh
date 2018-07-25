@@ -31,7 +31,8 @@ sh expectExpand.sh
 sh sshSilentLogin.sh
 
 ## 分发host
-sh ${ROOT_HOME}/tool/xsync /etc/hosts
+sh distributionHosts.sh
+
 ## 删除环境变量
 sh delete_env_variable_expand.sh
 

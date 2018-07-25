@@ -23,6 +23,10 @@ cd ${BIN_DIR}
 
 #检查selinux状态
 sh selinuxStatus.sh
+flag=$?
+if [[ $flag == 1 ]]; then
+    exit 1
+fi
 
 ##安装mysql
 sh mysqlInstall.sh
@@ -38,6 +42,9 @@ sh hadoopInstall.sh
 
 ##安装hbase
 sh hbaseInstall.sh
+
+##安装phoenix
+sh phonenixInstall.sh
 
 ##安装hive
 sh hiveInstall.sh

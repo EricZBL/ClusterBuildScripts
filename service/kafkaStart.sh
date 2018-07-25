@@ -53,8 +53,8 @@ cd kafka-manager/
 nohup bin/kafka-manager -Dconfig.file=${KAFKA_HOME}/kafka-manager/conf/application.conf &
 echo "kafka-manager已启动,请到浏览器访问..(端口号9000)"
 
-# 等待三秒后再验证Kafka是否启动成功
+# 等待7秒后再验证Kafka是否启动成功
 echo -e "********************验证Kafka是否启动成功*********************"
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'Kafka|jps show as bellow'

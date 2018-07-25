@@ -58,7 +58,7 @@ done
 
 # 验证Kafka是否停止成功
 echo -e "********************验证Kafka是否停止成功*********************"
-sleep 5s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'Kafka|jps show as bellow'
 

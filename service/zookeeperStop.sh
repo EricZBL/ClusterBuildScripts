@@ -36,6 +36,6 @@ done
 
 # 验证ZK是否停止成功
 echo -e "********************验证ZK是否停止成功*********************"
-sleep 3s
+sleep 7s
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'QuorumPeerMain|jps show as bellow'

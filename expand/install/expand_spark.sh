@@ -22,8 +22,11 @@ CLUSTER_BUILD_SCRIPTS_DIR=`pwd`
 CONF_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/expand/conf
 ## 安装日志目录
 LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
-## 安装日记目录
+## 安装日志文件
 LOG_FILE=${LOG_DIR}/expand_spark.log
+## 集群组件的日志文件目录 /opt/hzgc/logs
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+SPARK_LOG_PATH=${LOGS_PATH}/spark
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)
 ## 原集群节点
@@ -77,6 +80,7 @@ for insName in ${HOSTNAMES[@]}
 do
     echo "准备将 spark 发到新增节点 ${insName} ..." | tee -a $LOG_FILE
     scp -r ${SPARK_INSTALL_HOME} root@${insName}:${INSTALL_HOME} > /dev/null
+    ssh root@${insName} "mkdir -p ${SPARK_LOG_PATH};chmod -R 777 ${SPARK_LOG_PATH}"
     echo "分发到新增 ${insName} 节点完毕！！！" | tee -a $LOG_FILE
 done
 }
