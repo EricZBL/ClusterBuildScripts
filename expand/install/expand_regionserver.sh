@@ -97,6 +97,7 @@ echo "**********************************************" | tee -a $LOG_FILE
 ## 配置regionservers文件
 ## Hbase的从节点
 HBASE_HREGION_ARRY=(${HBASE_HREGIONSERVER//;/ })
+echo "" > ${HBASE_HOME}/conf/regionservers
 for hostname in ${HBASE_HREGION_ARRY[@]}
 do
 	echo $hostname >> ${HBASE_HOME}/conf/regionservers

@@ -117,7 +117,7 @@ mkdir -p ${HBASE_ZK_DATADIR}
 sed -i "s#zkaddress#${ZK_LISTS}#g" hbase-site.xml
 sed -i "s#hbase_tmp_dir#${HBASE_TMP_DIR}#g" hbase-site.xml
 sed -i "s#hbase_zookeeper_dataDir#${HBASE_ZK_DATADIR}#g" hbase-site.xml
-echo  “配置Hbase-site.xml done ......”  | tee -a $LOG_FILE
+echo  "配置Hbase-site.xml done ......"  | tee -a $LOG_FILE
 
 
 ## 拷贝Hadoop 的两个文件到hbas conf 目录下，拷贝前先确认是否安装配置了HADOOP
