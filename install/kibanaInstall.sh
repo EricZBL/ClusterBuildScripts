@@ -59,19 +59,19 @@ cp -r ${KIBANA_SOURCE_DIR}/kibana ${KIBANA_INSTALL_HOME}
 function mod_conf(){
     ## 修改server.host
     num=`grep -n "server.host:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`
-    sed -i "${num}c server.host:${KIBANA_NODE}" ${KIBANA_HOME}/config/kibana.yml
+    sed -i "${num}c server.host: \"${KIBANA_NODE}\"" ${KIBANA_HOME}/config/kibana.yml
 
     ## 修改server.name
     num=`grep -n "server.name:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`
-    sed -i "${num}c server.name:${KIBANA_NODE}" ${KIBANA_HOME}/config/kibana.yml
+    sed -i "${num}c server.name: \"${KIBANA_NODE}\"" ${KIBANA_HOME}/config/kibana.yml
 
     ## 修改es url
     num=`grep -n "elasticsearch.url:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`
-    sed -i "${num}c elasticsearch.url:\"http://${KIBANA_NODE}:9200\"" ${KIBANA_HOME}/config/kibana.yml
+    sed -i "${num}c elasticsearch.url: \"http://${KIBANA_NODE}:9200\"" ${KIBANA_HOME}/config/kibana.yml
 
     ## 修改requestTimeout
     num=`grep -n "elasticsearch.requestTimeout:" ${KIBANA_HOME}/config/kibana.yml | cut -d ':' -f1`
-    sed -i "${num}c elasticsearch.requestTimeout:\ 3000000" ${KIBANA_HOME}/config/kibana.yml
+    sed -i "${num}c elasticsearch.requestTimeout: 3000000" ${KIBANA_HOME}/config/kibana.yml
 
 }
 
