@@ -21,36 +21,24 @@ CONF_DIR=${ROOT_HOME}/conf
 ## 安装日记目录
 LOG_DIR=${ROOT_HOME}/logs
 ## 安装日记目录
-LOG_FILE=${LOG_DIR}/dos2unixInstall.log
+LOG_FILE=${LOG_DIR}/haproxy.log
 ## haproxy rpm 软件目录
 HAPROXY_RPM_DIR=${ROOT_HOME}/component/basic_suports/haproxyRpm
 ## 基础工具安装路径
 INSTALL_HOME_BASIC=$(grep System_SuportDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ## haproxy rpm 软件最终目录
 HAPROXY_RPM_INSTALL_HOME=${INSTALL_HOME_BASIC}/haproxyRpm
-
-
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ## HAPROXY_INSTALL_HOME HAPROXY 安装目录
 HAPROXY_INSTALL_HOME=${INSTALL_HOME}/HAProxy
-## HAPROXY_HOME  HAPROXY 根目录
-#HAPROXY_HOME=${HAPROXY_INSTALL_HOME}/haproxy
-## HAPROXY_LOG_DIR HAPROXY 日志目录
-#HAPROXY_LOG_DIR=${HAPROXY_HOME}/logs
-## HAPROXY_LOG_FILE HAPROXY 日志文件
-#HAPROXY_LOG_FILE=${HAPROXY_LOG_DIR}/haproxy.log
 ## HAPROXY_INIT 开机启动脚本
 HAPROXY_INIT=/etc/ini.d/haproxy
-##HAPROXY_CFG haproxy 配置文件
-#HAPROXY_CFG=${HAPROXY_HOME}/haproxy.cfg
-
 INSTALL_HOST=$(grep HAproxy_AgencyNode ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 ### HAproxy配置文件
 HAproxy_conf_file=${HAPROXY_INSTALL_HOME}.cfg
 ### HAproxy临时文件
 TMP_FILE=${HAPROXY_INSTALL_HOME}/tmp
-
 
 #####################################################################
 # 函数名: touch_ha_cfgfile
