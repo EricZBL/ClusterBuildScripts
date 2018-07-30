@@ -18,7 +18,7 @@
 cd `dirname $0`
 ## 脚本所在目录：../hzgc/service
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 脚本根目录：../hzgc
 ROOT_HOME=`pwd`
 ## gsFaceLib 压缩包目录：../hzgc/component/bigdata
@@ -34,38 +34,10 @@ GSFACELIB_HOSTNAME_LISTS=$(grep GsFaceLib_HostName ${CONF_DIR}/cluster_conf.prop
 GSFACELIB_HOSTNAME_ARRY=(${GSFACELIB_HOSTNAME_LISTS//;/ })
 
 
-
-
 if [ ! -d $LOG_DIR ];then
     mkdir -p $LOG_DIR;
 fi
-#---------------------------------------------------------------------#
-#                              定义函数                               #
-#---------------------------------------------------------------------#
 
-#####################################################################
-# 函数名: compression_the_tar
-# 描述: 解压GsFaceLib.tar.gz
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function compression_the_tar()
-{
-    echo ""  | tee -a $LOG_FILE
-    echo "**********************************************" | tee -a $LOG_FILE
-    echo "please waiting, GsFaceLib.tar.gz解压中........"  | tee -a $LOG_FILE
-
-    tar -xf ${GSFACELIB_SOURCE_DIR}/GsFaceLib.tar.gz -C ${GSFACELIB_SOURCE_DIR} #与注释的语句等价
-
-    echo "GsFaceLib, 解压完成........"  | tee -a $LOG_FILE
-    if [ $? == 0 ];then  ## 判断返回值
-        echo "解压GsFaceLib tar 包成功." | tee -a $LOG_FILE
-    else
-        echo "解压elastic tar 包失败，请检查包是否完整。" | tee -a $LOG_FILE  
-    fi
-    echo "" | tee -a $LOG_FILE
-}
 
 #####################################################################
 # 函数名: rsync_GsFaceLib

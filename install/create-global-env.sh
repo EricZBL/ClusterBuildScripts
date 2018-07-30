@@ -42,7 +42,7 @@ cp ${ROOT_HOME}/service/temporary_environment_variable.sh  ${ROOT_HOME}/env_bigd
 for host in ${CLUSTER_HOSTNAME_ARRY[@]}
 do
     echo "scp configuration to node ${host}"
-    scp  -r ${ROOT_HOME}/service  ${ROOT_HOME}/conf ${ROOT_HOME}/tool env_bigdata.sh root@${host}:/opt/hzgc  > /dev/null
+    scp  -r ${ROOT_HOME}/project ${ROOT_HOME}/expand ${ROOT_HOME}/service  ${ROOT_HOME}/conf ${ROOT_HOME}/tool env_bigdata.sh root@${host}:/opt/hzgc  > /dev/null
 	ssh root@${host}  "chmod -R 755 /opt/hzgc"
 done
 
