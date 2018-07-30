@@ -603,18 +603,13 @@ function copy_xml_to_service()
 function main()
 {
   config_projectconf   ##配置project-conf.properties
-  ## clouster模块
+  ## cluster模块
   copy_xml_to_spark             ##复制集群xml文件到cluster/spark目录下
   config_sparkjob          ##配置sparkjob.properties
   ## service模块
   config_service          ##配置service各个子模块的配置文件及启停脚本
   copy_xml_to_service     ##复制集群xml文件到各个子模块的conf下
-
   distribute_service  ##分发service模块
-
-
-
-  sh ./ftp_distribute.sh
 }
 
 #--------------------------------------------------------------------------#

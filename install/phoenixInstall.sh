@@ -55,7 +55,7 @@ cd ${SOURCE_DIR}
 
 ## 配置hbase-site.xml
 cd phoenix/bin
-sed -i 's#hbase_zookeeper_quorum#${ZK_LIST}#g' hbase-site.xml
+sed -i "s#hbase_zookeeper_quorum#${ZK_LIST}#g" hbase-site.xml
 
 ## 分发phoenix
 cd  ${SOURCE_DIR}
