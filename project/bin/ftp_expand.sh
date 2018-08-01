@@ -1,8 +1,8 @@
 #!/bin/bash
 ################################################################################
 ## Copyright:   HZGOSUN Tech. Co, BigData
-## Filename:    ftp_distribute.sh
-## Description: 一键配置及分发Collect（FTP）模块
+## Filename:    ftp_expand.sh
+## Description: 扩展安装Collect（FTP）模块
 ## Author:      zhangbaolin
 ## Created:     2018-07-26
 ################################################################################
@@ -104,6 +104,15 @@ function distribute_collect()
            echo "${ip}上分发collect完毕，开始配置配置文件中ftp.ip................." | tee -a $LOG_FILE
            ssh root@${ip} "sed -i 's#^ftp.ip=.*#ftp.ip=${ip}#g' ${COllECT_CONF_FILE}"
            echo "${ip}上修改配置文件完成.................." | tee -a $LOG_FILE
+
+           ##同步haproxy-ftp.properties配置文件
+           contain=`grep "${ip}" ${HAPROXY_FTP_CONF_FILE}`
+           if [[ -n ${contain} ]]; then
+               mainnum=`echo ${contain}| cut -d '=' -f1 | cut -d '.' -f3`
+               sed -i "/ftp.ip.${mainnum}=/s/$/ ${ip}" ${HAPROXY_FTP_CONF_FILE}
+           else
+               echo "${ip}已存在在ftp.ip.${mainnum}，不再修改"
+           fi
        done
    done
 }
