@@ -61,13 +61,15 @@ COMMON_LOG_FILE=${COMMON_LOG_DIR}/config-project.log
 ## service的log日志目录
 SERVICE_LOG_DIR=${SERVICE_DIR}/logs
 ## Service log日志文件
-SERVICE_LOG_FILE=${COMMON_LOG_DIR}/config-service.log
+SERVICE_LOG_FILE=${SERVICE_LOG_DIR}/config-service.log
 ## cluster-spark log日志目录
 SPARK_LOG_DIR=${SPARK_DIR}/logs
 ## cluster-spark log日志文件
 SPARK_LOG_FILE=${SPARK_LOG_DIR}/config-cluster.log
 
 mkdir -p ${SPARK_LOG_DIR}
+mkdir -p ${COMMON_LOG_DIR}
+mkdir -p ${SERVICE_LOG_DIR}
 ## address模块部署目录
 ADDRESS_DIR=${SERVICE_DIR}/address
 ADDRESS_BIN_DIR=${ADDRESS_DIR}/bin                                ##address模块脚本存放目录
@@ -409,7 +411,7 @@ function config_sparkjob()
 #####################################################################
 function config_service()
 {
-echo "" | tee -a ${SERVICE_LOG_FILE}
+    echo "" | tee -a ${SERVICE_LOG_FILE}
     echo "**************************************************" | tee -a ${SERVICE_LOG_FILE}
     echo "" | tee -a ${SERVICE_LOG_FILE}
     echo "开始配置service底下的各个模块......" | tee -a ${SERVICE_LOG_FILE}
@@ -443,6 +445,12 @@ echo "" | tee -a ${SERVICE_LOG_FILE}
        espro="$espro$es_host,"
     done
     espro=${espro%?}
+
+    kafka=`echo ${kafkapro}| cut -d "," -f1`
+    #替换模块启动脚本中：key=value(替换key字段的值value)
+    sed -i "s#^KAFKA_HOST=.*#KAFKA_HOST=${kafka}#g" ${STAREPO_START_FILE}
+    echo "start-starepo.sh脚本配置kafka完成......"
+
 
     #替换模块启动脚本中：key=value(替换key字段的值value)
     sed -i "s#^ES_HOST=.*#ES_HOST=${espro}#g" ${CLUSTERING_START_FILE}

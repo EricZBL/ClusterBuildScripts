@@ -12,7 +12,7 @@ set -e
 cd `dirname $0`
 ## 脚本所在目录
 BIN_DIR=`pwd`
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`   ##ClusterBuildScripts
 ## 集群配置文件目录
