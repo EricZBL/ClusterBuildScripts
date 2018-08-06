@@ -25,7 +25,7 @@ LOG_DIR=${CLUSTER_BUILD_SCRIPTS_DIR}/logs
 ## 安装日志文件
 LOG_FILE=${LOG_DIR}/expand_spark.log
 ## 集群组件的日志文件目录 /opt/hzgc/logs
-LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+LOGS_PATH=$(grep Cluster_LOGSDir ${CONF_DIR}/expand_conf.properties|cut -d '=' -f2)
 SPARK_LOG_PATH=${LOGS_PATH}/spark
 ## 最终安装的根目录，所有bigdata 相关的根目录
 INSTALL_HOME=$(grep Install_HomeDir ${CLUSTER_BUILD_SCRIPTS_DIR}/conf/cluster_conf.properties|cut -d '=' -f2)

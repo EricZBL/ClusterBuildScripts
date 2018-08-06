@@ -128,7 +128,7 @@ function config_conf ()
         echo ""  | tee  -a  $LOG_FILE
         echo ""  | tee  -a  $LOG_FILE
         echo "==================================================="  | tee -a $LOG_FILE
-        echo "修改hiveserver2 WEBUI地址 in {$insName}目录...... "  | tee -a $LOG_FILE
+        echo "修改hiveserver2 WEBUI地址 in ${insName}目录...... "  | tee -a $LOG_FILE
         NUM=$[`grep -n hive.zookeeper.quorum ${HIVE_HOME}/conf/hive-site.xml | cut -d " " -f1| cut -d ':' -f1`+1]
         ssh root@$insName "sed -i '${NUM}c ${VALUE}${hazk%?}${VALUE_END}'  ${HIVE_HOME}/conf/hive-site.xml"
         NUM=$[`grep -n hive.metastore.uris ${HIVE_HOME}/conf/hive-site.xml | cut -d " " -f1| cut -d ':' -f1`+1]

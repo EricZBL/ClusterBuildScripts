@@ -17,6 +17,6 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
-
+# 验证hadoop是否启动成功
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'NameNode|NodeManager|DataNode|ResourceManager|JournalNode|DFSZKFailoverController|jps show as bellow'

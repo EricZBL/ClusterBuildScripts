@@ -10,7 +10,7 @@
 ################################################################################
 
 #set -x
-set -e
+#set -e
 
 cd `dirname $0`
 ## 脚本所在目录
@@ -220,12 +220,12 @@ function writeUI_file()
     MASTER_IP=$(cat /etc/hosts|grep "$MASTER1" | awk '{print $1}')
     Hadoop_UI="http://${MASTER_IP}:50070"
     mkdir -p ${HadoopWebUI_Dir}
-    grep -q "HadoopUI_Address=" ${HadoopWebUI_Dir}/WebUI_Address
+    grep -q "HadoopUI_Address=" ${HadoopWebUI_File}
     if [ "$?" -eq "0" ]  ;then
-        sed -i "s#^HadoopUI_Address=.*#HadoopUI_Address=${Hadoop_UI}#g" ${HadoopWebUI_Dir}/WebUI_Address
+        sed -i "s#^HadoopUI_Address=.*#HadoopUI_Address=${Hadoop_UI}#g" ${HadoopWebUI_File}
     else
-        echo "##Hadoop_WebUI" >> ${HadoopWebUI_Dir}/WebUI_Address
-        echo "HadoopUI_Address=${Hadoop_UI}" >> ${HadoopWebUI_Dir}/WebUI_Address
+        echo "##Hadoop_WebUI" >> ${HadoopWebUI_File}
+        echo "HadoopUI_Address=${Hadoop_UI}" >> ${HadoopWebUI_File}
     fi 
 }
 

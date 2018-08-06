@@ -14,18 +14,18 @@ cd `dirname $0`
 BIN_DIR=`pwd`
 CONF_DIR=${BIN_DIR}/../conf
 CONF_FILE=${CONF_DIR}/project-conf.properties
-cd ..
+cd ../..
 ## 安装包根目录
 ROOT_HOME=`pwd`   ##ClusterBuildScripts
 ## 集群配置文件目录
 CLUSTER_CONF_DIR=${ROOT_HOME}/conf
 ## 集群配置文件
-CLUSTER_CONF_FILE=${CONF_DIR}/cluster_conf.properties
+CLUSTER_CONF_FILE=${CLUSTER_CONF_DIR}/cluster_conf.properties
 ## FTP服务器地址
 FTPIP=$(grep 'FTPIP' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
 ## 集群节点地址
 CLUSTERNODELIST=$(grep 'Cluster_HostName' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
-CLUSTERNODE=(${CLUSTERNODE//;/ })
+CLUSTERNODE=(${CLUSTERNODELIST//;/ })
 ## 本节点ip
 LOCALIP=`hostname -i`
 cd ..
@@ -67,6 +67,7 @@ SPARK_LOG_DIR=${SPARK_DIR}/logs
 ## cluster-spark log日志文件
 SPARK_LOG_FILE=${SPARK_LOG_DIR}/config-cluster.log
 
+mkdir -p ${SPARK_LOG_DIR}
 ## address模块部署目录
 ADDRESS_DIR=${SERVICE_DIR}/address
 ADDRESS_BIN_DIR=${ADDRESS_DIR}/bin                                ##address模块脚本存放目录
@@ -126,7 +127,7 @@ CORE_FILE=${HADOOP_HOME}/etc/hadoop/core-site.xml
 HDFS_FILE=${HADOOP_HOME}/etc/hadoop/hdfs-site.xml
 HBASE_INSTALL_HOME=${INSTALL_HOME}/HBase              ### hbase 安装目录
 HBASE_HOME=${HBASE_INSTALL_HOME}/hbase                ### hbase 根目录
-HBASE_FILE=${HBASE_HOME}/hbase/conf/hbase-site.xml
+HBASE_FILE=${HBASE_HOME}/conf/hbase-site.xml
 HIVE_INSTALL_HOME=${INSTALL_HOME}/Hive                ### hive 安装目录
 HIVE_HOME=${HIVE_INSTALL_HOME}/hive                   ### hive 根目录
 SPARK_INSTALL_HOME=${INSTALL_HOME}/Spark              ### spark 安装目录
@@ -142,43 +143,43 @@ SPARK_HOME=${SPARK_INSTALL_HOME}/spark                ### spark 根目录
 #####################################################################
 function config_projectconf()
 {
-    for node in ${CLUSTERNODE[@]};do
+
       #  ## 分发RealTimeFaceCompare，若是本节点则不分发
       #  if [[  x"${node}" != x"${LOCALIP}" ]]; then
       #      scp -r ${RTFC_HOME} root@node:${RTFC_HOME}
       #  fi
         ## 修改common模块配置文件
         ## 修改配置文件 zookeeper安装节点
-        echo "配置${node}上 project-conf.properties中的zookeeper地址"
+        echo "配置$ project-conf.properties中的zookeeper地址"
         zookeeper=$(grep 'Zookeeper_InstallNode' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
-        ssh root@node "sed -i 's#zookeeper_installnode=.*#zookeeper_installnode=${zookeeper}#g' ${CONF_FILE}"
+        sed -i "s#zookeeper_installnode=.*#zookeeper_installnode=${zookeeper}#g" ${CONF_FILE}
 
         ## 修改配置文件 kafka安装节点
-        echo "配置${node}上 project-conf.properties中的kafka地址"
+        echo "配置 project-conf.properties中的kafka地址"
         kafka=$(grep 'Kafka_InstallNode' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
-        ssh root@node "sed -i 's#kafka_install_node=.*#kafka_install_node=${kafka}#g' ${CONF_FILE}"
+        sed -i "s#kafka_install_node=.*#kafka_install_node=${kafka}#g" ${CONF_FILE}
 
         ## 修改配置文件 rocketmq安装节点
-        echo "配置${node}上 project-conf.properties中的rocketmq地址"
+        echo "配置 project-conf.properties中的rocketmq地址"
         rocketmq=$(grep 'RocketMQ_Namesrv' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
-        ssh root@node "sed -i 's#rocketmq.address=.*#rocketmq.address=${rocketmq}#g' ${CONF_FILE}"
+        sed -i "s#rocketmq_nameserver=.*#rocketmq_nameserver=${rocketmq}#g" ${CONF_FILE}
 
          ## 修改配置文件 es安装节点
-        echo "配置${node}上 project-conf.properties中的rocketmq地址"
+        echo "配置 project-conf.properties中的rocketmq地址"
         rocketmq=$(grep 'ES_InstallNode' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
-        ssh root@node "sed -i 's#es_service_node=.*#es_service_node=${rocketmq}#g' ${CONF_FILE}"
+        sed -i "s#es_service_node=.*#es_service_node=${rocketmq}#g" ${CONF_FILE}
 
         ## 修改配置文件 jdbc_service节点
-         echo "配置${node}上 project-conf.properties中的jdbc_service地址"
+         echo "配置 project-conf.properties中的jdbc_service地址"
         sparknode=$(grep 'Spark_ServiceNode' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
         sparknamenode=$(grep 'Spark_NameNode' ${CLUSTER_CONF_FILE} | cut -d '=' -f2)
         if [[ "${sparknode}" =~ "${sparknamenode}" ]]; then
             sparknode=(${sparknode#/$sparknamenode})
-            ssh root@node "sed -i 's#jdbc_service_node=.*#jdbc_service_node=${sparknode}#g' ${CONF_FILE}"
+            sed -i "s#jdbc_service_node=.*#jdbc_service_node=${sparknode}#g" ${CONF_FILE}
         else
-            ssh root@node "sed -i 's#jdbc_service_node=.*#jdbc_service_node=${sparknode};${sparknamenode}#g' ${CONF_FILE}"
+            sed -i "s#jdbc_service_node=.*#jdbc_service_node=${sparknode};${sparknamenode}#g" ${CONF_FILE}
         fi
-    done
+
 }
 
 
@@ -377,10 +378,16 @@ function config_sparkjob()
     #替换sparkJob.properties中：key=value(替换key字段的值value)
     sed -i "s#^rocketmq.nameserver=.*#rocketmq.nameserver=${rockpro}#g"  ${CONF_SPARK_DIR}/sparkJob.properties
 
-    # 根据job_clustering_mysql_url字段设置常驻人口管理告警信息MYSQL数据库地址
-    num=$[ $(cat ${CONF_SPARK_DIR}/sparkJob.properties | cat -n | grep job.clustering.mysql.url  | awk '{print $1}') ]
-    value=$(grep job_clustering_mysql_url ${CONF_FILE}  |  awk  -F  "url=" '{print $2}')
-    value="job.clustering.mysql.url=${value}"
+    # 根据job_clustering_mysql_alarm_url字段设置常驻人口管理告警信息MYSQL数据库地址
+    num=$[ $(cat ${CONF_SPARK_DIR}/sparkJob.properties | cat -n | grep job.clustering.mysql.alarm.url  | awk '{print $1}') ]
+    value=$(grep job_clustering_mysql_alarm_url ${CONF_FILE}  |  awk  -F  "url=" '{print $2}')
+    value="job.clustering.mysql.alarm.url=${value}"
+    sed -i "${num}c ${value}"  ${CONF_SPARK_DIR}/sparkJob.properties
+
+     # 根据job_clustering_mysql_device_url字段设置常驻人口管理告警信息MYSQL数据库地址
+    num=$[ $(cat ${CONF_SPARK_DIR}/sparkJob.properties | cat -n | grep job.clustering.mysql.device.url  | awk '{print $1}') ]
+    value=$(grep job_clustering_mysql_device_url ${CONF_FILE}  |  awk  -F  "url=" '{print $2}')
+    value="job.clustering.mysql.device.url==${value}"
     sed -i "${num}c ${value}"  ${CONF_SPARK_DIR}/sparkJob.properties
 
     echo "配置完毕......"  | tee  -a  ${SPARK_LOG_FILE}

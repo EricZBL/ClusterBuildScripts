@@ -19,6 +19,14 @@ cd ..
 ROOT_HOME=`pwd`
 ##配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+WebUI_Dir=$(grep WebUI_Dir ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
+WebUI_File=${WebUI_Dir}/WebUI_Address
+if [[ -d ${WebUI_Dir} ]]; then
+    touch ${WebUI_File}
+    else
+    mkdir -p ${WebUI_Dir}
+    touch ${WebUI_File}
+fi
 
 cd ${BIN_DIR}
 
@@ -45,7 +53,7 @@ sh hadoopInstall.sh
 sh hbaseInstall.sh
 
 ##安装phoenix
-sh phonenixInstall.sh
+sh phoenixInstall.sh
 
 ##安装hive
 sh hiveInstall.sh
@@ -67,6 +75,9 @@ sh haproxyInstall.sh
 
 ##安装elastic
 sh elasticInstall.sh
+
+##安装kibana
+sh kibanaInstall.sh
 
 ##安装azkaban
 sh azkabanInstall.sh

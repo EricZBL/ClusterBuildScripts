@@ -20,7 +20,7 @@ cd ..
 CLUSTER_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${CLUSTER_HOME}/conf
-# 验证es是否启动成功
+# 验证rocketmq是否启动成功
 echo -e "********************验证rocketMQ各节点服务状态*********************"
 source $(grep Source_File ${CONF_DIR}/cluster_conf.properties|cut -d '=' -f2)
 xcall jps | grep -E 'NamesrvStartup|BrokerStartup|jps show as bellow'

@@ -37,6 +37,11 @@ PHOENIX_HOME=${PHOENIX_INSTALL_HOME}/phoenix
 CLUSTER_CONF_FILE=${CONF_DIR}/cluster_conf.properties
 ##扩展配置文件
 EXPAND_CONF_FILE=${EXPAND_CONF_DIR}/expand_conf.properties
+## <value>
+VALUE="<value>"
+## </value>
+VALUE_END="</value>"
+
 
 ## 设置和获取HBase 集群的配置
 ZK_LIST=""
@@ -56,10 +61,11 @@ done
 #cd ${SOURCE_DIR}
 #rm -rf phoenix
 #tar -xf phoenix.tar.gz
-
+cd ${PHOENIX_HOME}/bin
 ## 配置hbase-site.xml
-cd phoenix/bin
-sed -i 's#hbase_zookeeper_quorum#${ZK_LIST}#g' hbase-site.xml
+## cd phoenix/bin
+num=$[`grep -n "hbase.zookeeper.quorum" hbase-site.xml | cut -d " " -f1`+1]
+sed -i "c${num} ${VALUE}${ZK_LIST}${VALUE_END}" hbase-site.xml
 
 ## 分发phoenix
 cd  ${SOURCE_DIR}

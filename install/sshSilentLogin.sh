@@ -11,7 +11,7 @@
 ################################################################################
 
 #set -x
-set -e
+#set -e
 
 #---------------------------------------------------------------------#
 #                              定义变量                               #
@@ -119,9 +119,9 @@ EOF
 deliver_authorizedkesy_to_other_node(){
     expect <<EOF
     set timeout 1
-    spawn scp /root/.ssh/authorized_keys root@$1:/root/.ssh
+    spawn scp /root/.ssh/authorized_keys root@$1:/root/.ssh/
     expect {
-        "*assword" {send "${PASSWORD}\r";}
+        "password" {send "${PASSWORD}\r";}
         "yes/no" {send "yes\r";exp_continue}
     }
     expect eof

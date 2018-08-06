@@ -11,7 +11,7 @@
 ################################################################################
 
 #set -x
-set -e
+#set -e
 
 cd `dirname $0`
 ## 脚本所在目录
@@ -72,7 +72,6 @@ do
     echo "拷贝安装包到${insName}临时安装目录"  | tee -a $LOG_FILE
     cp -R ${ZOOKEEPER_SOURCE_DIR}/zookeeper ${ZOOKEEPER_SOURCE_DIR}/$insName
     let i++
-    
     value1=$(grep "server.${i}" ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg)
     if [ -n "${value1}" ];then
 	sed -i "s#server.${i}=.*#server.${i}=${insName}:2888:3888#g"  ${ZOOKEEPER_SOURCE_DIR}/zookeeper/conf/zoo.cfg

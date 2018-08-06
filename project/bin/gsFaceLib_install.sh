@@ -62,7 +62,7 @@ function rsync_GsFaceLib(){
 # 函数名: add_env
 # 描述: 在各个节点上判断/etc/profile中环境变量设置字串存在
 #       不存在则添加追加到文件末尾：export LD_LIBRARY_PATH=/opt/GsFaceLib/face_libs
-                                    export OPENBLAS_NUM_THREADS=1
+#                              export OPENBLAS_NUM_THREADS=1
 # 参数: N/A
 # 返回值: N/A
 # 其他: N/A
@@ -78,7 +78,7 @@ function add_env(){
     #done
 	
 	##########新脚本
-	### 增加facelibs环境变量，若先前有配置，要先删除原来的（马燊偲）
+	### 增加facelibs环境变量，若先前有配置，要先删除原来的
 	### ssh到每个节点，查找etc/profile中是否存在facelibs系统变量行，若存在，则替换；若不存在，则追加。
 	LD_LIBRARY_PATH=/opt/GsFaceLib/face_libs
 	for hostname in ${GSFACELIB_HOSTNAME_ARRY[@]};do
@@ -98,6 +98,7 @@ function add_env(){
         fi
 	done
 }
+
 #####################################################################
 # 函数名: remove_snini
 # 描述: 删除/opt/GsFaceLib下sn.ini文件

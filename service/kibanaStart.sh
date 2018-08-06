@@ -47,7 +47,7 @@ echo "==================================================="  | tee -a $LOG_FILE
 echo "$(date "+%Y-%m-%d  %H:%M:%S")"                       | tee  -a  $LOG_FILE
 
 ## 启动kibana
-cd ${KIBANA_INSTALL_HOME}
+cd ${KIBANA_HOME}/bin
 
 echo "启动kibana"
  ./kibana > /dev/null &

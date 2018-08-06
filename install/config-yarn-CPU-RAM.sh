@@ -51,26 +51,6 @@ CLUSTER_HOST=$(grep Cluster_HostName ${CONF_DIR}/cluster_conf.properties|cut -d 
 HOSTNAMES=(${CLUSTER_HOST//;/ }) 
 
 
-#####################################################################
-# 函数名:config_yarn,这个函数已经弃用
-# 描述: 配置yarn的CPU和内存
-# 参数: N/A
-# 返回值: N/A
-# 其他: N/A
-#####################################################################
-function config_yarn ()
-{
-    echo ""  | tee -a $LOG_FILE
-    echo "****************************************************"  | tee -a $LOG_FILE
-    echo "正在配置yarn的内存与CPU，请稍候......."  | tee -a $LOG_FILE
-    echo "获取当前机器配置信息:cores=${CORES},MEMORY=${MEMORY},DISKS=${DISKS},HBASE=${HBASE}"
-    python yarn-utils.py -c ${CORES} -m ${MEMORY} -d ${DISKS} -k ${HBASE} > ${BIN_DIR}/chenke.sb  | tee -a $LOG_FILE
-    echo "${BIN_DIR}/chenke.sb文件内容:"  | tee -a $LOG_FILE
-    echo "----------------------------------------------------"  | tee -a $LOG_FILE
-    cat ${BIN_DIR}/chenke.sb  | tee -a $LOG_FILE
-    echo "----------------------------------------------------"  | tee -a $LOG_FILE
-    echo "配置yarn完成!!!!!!"  | tee -a $LOG_FILE
-}
 
 #####################################################################
 # 函数名:config_yarn_site_xml
@@ -87,10 +67,10 @@ function config_yarn_site_xml ()
 	echo "进入${YARN_SITE_XML_DIR}目录，准备配置yarn-site.xml"  |  tee -a $LOG_FILE
 	for node in ${HOSTNAMES};do
 	    ## 获取当前机器core数量
-        CORES=`ssh root@node "cat /proc/cpuinfo| grep 'processor'| wc -l"`
+        CORES=`ssh root@$node "cat /proc/cpuinfo| grep 'processor'| wc -l"`
         ## 获取当前机器内存
         MEM=`ssh root@$node "echo $(free -h | grep 'Mem' | awk '{print $2}')"`
-        MEMORY=${CMD%?}
+        MEMORY=${MEM%?}
         ## yarn node manager 的最大内存
         YARN_MAX_MEN=$(echo `echo "scale=1;${MEMORY}*0.8*1024"|bc`  | awk -F "." '{print $1}')
 	    if [ -f "${YARN_SITE_XML}" ]; then
@@ -107,7 +87,7 @@ function config_yarn_site_xml ()
 	    	    sed -i "${num6}c ${VALUE}${CORES}${VALUE_END}" ${YARN_SITE_XML}
 		    fi
             else
-		    echo "Not Found \"${YARN_SITE_XML_DIR}\" or \"${BIN_DIR}/chenke.sb\" file!"  |  tee -a $LOG_FILE
+		    echo "Not Found \"${YARN_SITE_XML}\"  file!"  |  tee -a $LOG_FILE
 	    fi
 	done
 

@@ -40,7 +40,7 @@ function main
         fi
 	done
 	if [[ -n "${HOSTS}" ]]; then
-	    echo "需设置${HOSTS}的selinux为disabled，重启机器生效后安装组件"
+	    echo "${HOSTS}的selinux状态为enable，需设置为disabled，重启机器生效后安装组件"
 	    exit 1
 	fi
 

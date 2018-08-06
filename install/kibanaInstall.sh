@@ -10,7 +10,7 @@
 ################################################################################
 
 #set -x
-set -e
+#set -e
 
 cd `dirname $0`
 ## 脚本所在目录
@@ -53,8 +53,9 @@ if [ -e ${KIBANA_INSTALL_HOME} ];then
     echo "删除原有kibana"
     rm -rf ${KIBANA_INSTALL_HOME};
 fi
-
+mkdir -p ${KIBANA_INSTALL_HOME}
 cp -r ${KIBANA_SOURCE_DIR}/kibana ${KIBANA_INSTALL_HOME}
+chmod -R 755 ${KIBANA_INSTALL_HOME}
 }
 
 function mod_conf(){
