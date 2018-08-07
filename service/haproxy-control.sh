@@ -11,7 +11,7 @@
 #下面两行注释解决“服务不支持 chkconfig”：
 #chkconfig: 2345 80 90
 #description:auto_run
-set -e
+#set -e
 #set -x
 
 HAPROXY_DIR=""                                   ##haproxy根目录

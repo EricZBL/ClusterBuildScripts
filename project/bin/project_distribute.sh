@@ -7,7 +7,7 @@
 ## Created:     2018-07-26
 ################################################################################
 #set -x  ## 用于调试用，不用的时候可以注释掉
-set -e
+#set -e
 
 cd `dirname $0`
 ## 脚本所在目录
@@ -433,6 +433,11 @@ function config_service()
     sed -i "s#^kafka.bootstrap.servers=.*#kafka.bootstrap.servers=${kafka_arr[0]:9092}#g" ${STAREPO_START_FILE}
     echo "静态库application-pro文件配置完成......"
 
+    #####################KAFKA_HOST#########################
+    #替换模块启动脚本中KAFKA_HOST：key=value(替换key字段的值value)
+    sed -i "s#^KAFKA_HOST=.*#KAFKA_HOST=${kafka}#g" ${STAREPO_START_FILE}
+    echo "start-starepo.sh脚本配置kafka完成......"
+
     #配置es.hosts:
     #从project-conf.properties中读取es所需配置IP
     #根据字段es，查找配置文件，这些值以分号分隔
@@ -447,11 +452,8 @@ function config_service()
     espro=${espro%?}
 
     kafka=`echo ${kafkapro}| cut -d "," -f1`
-    #替换模块启动脚本中：key=value(替换key字段的值value)
-    sed -i "s#^KAFKA_HOST=.*#KAFKA_HOST=${kafka}#g" ${STAREPO_START_FILE}
-    echo "start-starepo.sh脚本配置kafka完成......"
 
-
+    #####################ES_HOST#########################
     #替换模块启动脚本中：key=value(替换key字段的值value)
     sed -i "s#^ES_HOST=.*#ES_HOST=${espro}#g" ${CLUSTERING_START_FILE}
     echo "start-clustering.sh脚本配置es完成......"
@@ -473,6 +475,7 @@ function config_service()
     echo "start-alarm.sh脚本配置es完成......"
 
 
+    #####################ZOOKEEPER_HOST#########################
     #配置zookeeper：
     #从project-conf.properties中读取zookeeper所需配置IP
     #根据字段zookeeper，查找配置文件，这些值以分号分隔
@@ -502,6 +505,7 @@ function config_service()
     echo "start-alarm.sh脚本配置zookeeper完成......"
 
 
+    #####################EUREKA_IP#########################
     #配置eureka_node:
     #从project-conf.properties中读取eureka_node所需配置ip
     #根据字段eureka_node，查找配置文件，这些值以分号分隔
@@ -546,6 +550,8 @@ function config_service()
     sed -i "s#^EUREKA_IP=.*#EUREKA_IP=${enpro}#g" ${ALARM_START_FILE}
     echo "start-alarm.sh脚本配置eureka_node完成......."
 
+
+    #####################EUREKA_PORT#########################
     #配置eureka_port:
     #从project-conf.properties中读取eureka_port所需配置port
     #根据字段eureka_port,查找配置文件

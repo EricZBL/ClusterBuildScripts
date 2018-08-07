@@ -7,7 +7,7 @@
 ## Author:      qiaokaifeng、mashencai
 ## Created:     2017-10-24
 ################################################################################
-set -e
+#set -e
 #set -x
 
 cd `dirname $0`

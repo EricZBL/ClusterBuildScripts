@@ -7,7 +7,7 @@
 ## Author:      zhangbaolin
 ## Created:     2018-06-28 
 ################################################################################
-set -e
+##set -e
 #set -x
 
 #---------------------------------------------------------------------#
@@ -69,7 +69,7 @@ function rsync_GsFaceLib(){
 #####################################################################
 function add_env(){
     echo "**********************************************" | tee -a $LOG_FILE
-    echo "please waiting, 添加/opt/profile中的GsFaceLib环境变量 ........"  | tee -a $LOG_FILE
+    echo "please waiting, 添加/etc/profile中的GsFaceLib环境变量 ........"  | tee -a $LOG_FILE
 	
 	##########原脚本
     #for hostname in ${GSFACELIB_HOSTNAME_ARRY[@]};do
