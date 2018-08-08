@@ -82,7 +82,7 @@ defaults
     
 ########服务器节点配置########
 listen ftp
-    bind 0.0.0.0:2121                            ##设置haproxy监控的服务器和端口号，0.0.0.0默认全网段
+    bind 0.0.0.0:2122                            ##设置haproxy监控的服务器和端口号，0.0.0.0默认全网段
     mode tcp                                     ##http的7层模式
     #balance roundrobin  
     balance source                               ##设置默认负载均衡方式，类似于nginx的ip_hash
@@ -91,7 +91,7 @@ listen ftp
     #weight num权重 默认为1，最大值为256，0表示不参与负载均衡
     #check启用后端执行健康检测
     #inter num 健康状态检测时间间隔
-    ##server s112 172.18.18.112:2121 weight 1 maxconn 10000 check inter 10s  
+    ##server s112 172.18.18.112:2122 weight 1 maxconn 10000 check inter 10s
 
 ########统计页面配置########
 listen admin_stats  
@@ -149,9 +149,9 @@ function cfg_config ()
     # 在文件末尾添加FTP服务节点hostname=ip 
     for ftp_ip in ${host_iparr[@]}
     do
-        echo "server ${ftp_ip//=/ }:2121 weight 1 maxconn 10000 check inter 10s" >> ${TMP_FILE}
+        echo "server ${ftp_ip//=/ }:2122 weight 1 maxconn 10000 check inter 10s" >> ${TMP_FILE}
     done
-	# 将临时文件中hostname ip追加到##server s2 172.18.18.112:2121 weight 1 maxconn 10000 check inter 10s
+	# 将临时文件中hostname ip追加到##server s2 172.18.18.112:2122 weight 1 maxconn 10000 check inter 10s
 	sed -i "/##server/ r ${TMP_FILE}" ${HAproxy_conf_file}
 	scp  ${HAproxy_conf_file} root@${INSTALL_HOST}:/etc/haproxy/haproxy.cfg
         rm -rf ${TMP_FILE}
