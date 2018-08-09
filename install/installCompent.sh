@@ -28,75 +28,83 @@ if [[ -d ${WebUI_Dir} ]]; then
     touch ${WebUI_File}
 fi
 
-cd ${BIN_DIR}
+## 本地模式目录
+LOCAL_DIR=${ROOT_HOME}/local
 
-#检查selinux状态
-sh selinuxStatus.sh
-flag=$?
-if [[ $flag == 1 ]]; then
-    exit 1
-fi
+ISLOCAL=$(grep "ISLOCAL" CONF_DIR=${ROOT_HOME}/conf/cluster_conf.properties | cut -d "=" -f2)
 
-##安装mysql
-sh mysqlInstall.sh
-
-##安装jdk
-sh jdkInstall.sh
-
-##安装zookeeper
-sh zookeeperInstall.sh
-
-##安装hadoop
-sh hadoopInstall.sh
-
-##安装hbase
-sh hbaseInstall.sh
-
-##安装phoenix
-sh phoenixInstall.sh
-
-##安装hive
-sh hiveInstall.sh
-
-##安装scala
-sh scalaInstall.sh
-
-##安装kafka
-sh kafkaInstall.sh
-
-##安装spark
-sh sparkInstall.sh
-
-##安装rocketmq
-sh rocketmqInstall.sh
-
-##安装haproxy
-sh haproxyInstall.sh
-
-##安装elastic
-sh elasticInstall.sh
-
-##安装kibana
-sh kibanaInstall.sh
-
-##安装azkaban
-sh azkabanInstall.sh
-
-#配置环境变量
-sh create-global-env.sh
-
-#配置组件日志目录
-sh logconfig.sh
-
-##根据集群类型修改yarn参数
-ISMINICLUSTER=$(grep "ISMINICLUSTER" ${CONF_DIR}/cluster_conf.properties | cut -d '=' -f2)
-if [ "x${ISMINICLUSTER}" == "xno"  ]; then
-    sh config-yarn-CPU-RAM.sh
+if  [[ "${ISLOCAL}" == "yes"  ]]; then
+    sh ${LOCAL_DIR}/bin/componentInstall_local.sh
+    echo "安装本地模式集群完成"
 else
-    sh config-mini-yarn.sh
-fi
+    cd ${BIN_DIR}
+    #检查selinux状态
+    sh selinuxStatus.sh
+    flag=$?
+    if [[ $flag == 1 ]]; then
+        exit 1
+    fi
 
-echo "安装完成"
+    ##安装mysql
+    sh mysqlInstall.sh
+
+    ##安装jdk
+    sh jdkInstall.sh
+
+    ##安装zookeeper
+    sh zookeeperInstall.sh
+
+    ##安装hadoop
+    sh hadoopInstall.sh
+
+    ##安装hbase
+    sh hbaseInstall.sh
+
+    ##安装phoenix
+    sh phoenixInstall.sh
+
+    ##安装hive
+    sh hiveInstall.sh
+
+    ##安装scala
+    sh scalaInstall.sh
+
+    ##安装kafka
+    sh kafkaInstall.sh
+
+    ##安装spark
+    sh sparkInstall.sh
+
+    ##安装rocketmq
+    sh rocketmqInstall.sh
+
+    ##安装haproxy
+    sh haproxyInstall.sh
+
+    ##安装elastic
+    sh elasticInstall.sh
+
+    ##安装kibana
+    sh kibanaInstall.sh
+
+    ##安装azkaban
+    sh azkabanInstall.sh
+
+    #配置环境变量
+    sh create-global-env.sh
+
+    #配置组件日志目录
+    sh logconfig.sh
+
+    ##根据集群类型修改yarn参数
+    ISMINICLUSTER=$(grep "ISMINICLUSTER" ${CONF_DIR}/cluster_conf.properties | cut -d '=' -f2)
+    if [ "x${ISMINICLUSTER}" == "xno"  ]; then
+        sh config-yarn-CPU-RAM.sh
+    else
+        sh config-mini-yarn.sh
+    fi
+     echo "安装分布式集群完成"
+fi
 
 
 

@@ -19,25 +19,34 @@ cd ..
 ROOT_HOME=`pwd`
 ## 配置文件目录
 CONF_DIR=${ROOT_HOME}/conf
+## 本地模式目录
+LOCAL_DIR=${ROOT_HOME}/local
 
-cd ${BIN_DIR}
-## 安装sshpass
-sh sshpassInstall.sh
+ISLOCAL=$(grep "ISLOCAL" CONF_DIR=${ROOT_HOME}/conf/cluster_conf.properties | cut -d "=" -f2)
 
-## 安装dos2unix
-sh dos2unixInstall.sh
+if  [[ "${ISLOCAL}" == "yes"  ]]; then
+    sh ${LOCAL_DIR}/bin/envInstall_local.sh
+    else
+    cd ${BIN_DIR}
+    ## 安装sshpass
+    sh sshpassInstall.sh
 
-## 安装expect
-sh expectInstall.sh
+    ## 安装dos2unix
+    sh dos2unixInstall.sh
 
-## 配置免密登录
-sh sshSilentLogin.sh
+    ## 安装expect
+    sh expectInstall.sh
 
-## 分发host
-sh ../tool/xsync /etc/hosts
+    ## 配置免密登录
+    sh sshSilentLogin.sh
 
-## 删除环境变量
-sh delete_env_variable.sh
+    ## 分发host
+    sh ../tool/xsync /etc/hosts
 
-## 关闭防火墙
-sh offIptables.sh
+    ## 删除环境变量
+    sh delete_env_variable.sh
+
+    ## 关闭防火墙
+    sh offIptables.sh
+
+fi
