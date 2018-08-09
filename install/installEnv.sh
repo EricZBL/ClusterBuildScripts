@@ -22,7 +22,7 @@ CONF_DIR=${ROOT_HOME}/conf
 ## 本地模式目录
 LOCAL_DIR=${ROOT_HOME}/local
 
-ISLOCAL=$(grep "ISLOCAL" CONF_DIR=${ROOT_HOME}/conf/cluster_conf.properties | cut -d "=" -f2)
+ISLOCAL=$(grep "ISLOCAL" ${CONF_DIR}/cluster_conf.properties | cut -d "=" -f2)
 
 if  [[ "${ISLOCAL}" == "yes"  ]]; then
     sh ${LOCAL_DIR}/bin/envInstall_local.sh
