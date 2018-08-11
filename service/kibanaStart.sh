@@ -52,7 +52,4 @@ cd ${KIBANA_HOME}/bin
 echo "启动kibana"
  ./kibana > /dev/null &
 
-
-main
-
 set +x
